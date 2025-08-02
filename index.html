@@ -3,501 +3,330 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>H.M.C. TRADERS - AI Business Management Dashboard</title>
+    <title>H.M.C. Traders - Fresh Ginger & Dry Ginger Merchants</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Header Section -->
-        <header class="main-header">
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
             <div class="header-content">
-                <div class="company-branding">
-                    <div class="company-logo">🌿</div>
-                    <div class="company-info">
-                        <h1 class="company-name">H.M.C. TRADERS</h1>
-                        <p class="company-tagline">Fresh Ginger & Dry Ginger Merchants</p>
-                    </div>
+                <div class="logo">
+                    <h1>H.M.C. Traders</h1>
+                    <span class="tagline">Fresh Ginger & Dry Ginger Merchants</span>
                 </div>
-                <div class="header-actions">
-                    <div class="ai-indicator">
-                        <div class="ai-pulse"></div>
-                        <span>AI Active</span>
+                <nav class="nav">
+                    <ul class="nav-list">
+                        <li><a href="#home" class="nav-link active">Home</a></li>
+                        <li><a href="#about" class="nav-link">About</a></li>
+                        <li><a href="#services" class="nav-link">Services</a></li>
+                        <li><a href="#invoice" class="nav-link">Invoice</a></li>
+                        <li><a href="#contact" class="nav-link">Contact</a></li>
+                        <li><button class="btn btn--primary btn--sm" id="loginBtn">Login</button></li>
+                    </ul>
+                </nav>
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">☰</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav hidden" id="mobileNav">
+        <ul class="mobile-nav-list">
+            <li><a href="#home" class="nav-link">Home</a></li>
+            <li><a href="#about" class="nav-link">About</a></li>
+            <li><a href="#services" class="nav-link">Services</a></li>
+            <li><a href="#invoice" class="nav-link">Invoice</a></li>
+            <li><a href="#contact" class="nav-link">Contact</a></li>
+            <li><button class="btn btn--primary btn--sm mobile-login-btn">Login</button></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Home Section -->
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <div class="container">
+                    <h2 class="hero-title">Premium Ginger Trading Solutions</h2>
+                    <p class="hero-description">
+                        Leading supplier of fresh and dry ginger across India. We specialize in ginger washing, 
+                        processing, and distribution with a commitment to quality and reliability.
+                    </p>
+                    <div class="hero-location">
+                        <p>📍 Chikkidagodu-577413, Soraba Tq, Shivamogga, Karnataka</p>
                     </div>
-                    <div class="user-profile">
-                        <div class="profile-info">
-                            <span class="profile-name">Sadiq</span>
-                            <span class="profile-phone">+9740459661</span>
+                    <div class="hero-actions">
+                        <a href="#services" class="btn btn--primary btn--lg">Our Services</a>
+                        <a href="#contact" class="btn btn--outline btn--lg">Get In Touch</a>
+                    </div>
+                    <div class="hero-contacts">
+                        <div class="contact-item">
+                            <span>📞 9740459661 (Sadiq)</span>
                         </div>
-                        <div class="profile-avatar">👤</div>
+                        <div class="contact-item">
+                            <span>📞 9972200610 (Munavvar)</span>
+                        </div>
+                        <div class="contact-item">
+                            <span>✉️ sadiqhmc83@gmail.com</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </header>
+        </section>
 
-        <!-- Navigation Tabs -->
-        <nav class="main-navigation">
-            <div class="nav-tabs">
-                <button class="nav-tab active" data-tab="dashboard">
-                    <span class="tab-icon">📊</span>
-                    <span class="tab-label">Dashboard</span>
-                </button>
-                <button class="nav-tab" data-tab="processing">
-                    <span class="tab-icon">⚙️</span>
-                    <span class="tab-label">Processing</span>
-                </button>
-                <button class="nav-tab" data-tab="inventory">
-                    <span class="tab-icon">📦</span>
-                    <span class="tab-label">Inventory & Trading</span>
-                </button>
-                <button class="nav-tab" data-tab="insights">
-                    <span class="tab-icon">🧠</span>
-                    <span class="tab-label">AI Insights</span>
-                </button>
+        <!-- About Section -->
+        <section id="about" class="section">
+            <div class="container">
+                <h2 class="section-title">About H.M.C. Traders</h2>
+                <div class="about-content">
+                    <div class="about-text">
+                        <h3>Our Mission</h3>
+                        <p>
+                            H.M.C. Traders has been a trusted name in the ginger trading industry, specializing in 
+                            the washing, processing, and supply of premium quality ginger across different parts of India. 
+                            Our commitment to quality and customer satisfaction has made us a preferred partner for 
+                            businesses seeking reliable ginger supply solutions.
+                        </p>
+                        
+                        <h3>Quality Assurance</h3>
+                        <p>
+                            We maintain the highest standards of quality through our professional ginger washing and 
+                            processing facilities. Our products undergo thorough quality testing and certification 
+                            processes to ensure they meet industry standards and customer expectations.
+                        </p>
+                        
+                        <h3>Supply Chain Excellence</h3>
+                        <p>
+                            With our strategic location in Chikkidagodu, Karnataka, and efficient distribution network, 
+                            we ensure timely delivery of fresh and dry ginger to clients across India. Our supply chain 
+                            covers major markets and industrial hubs nationwide.
+                        </p>
+                    </div>
+                    <div class="about-info">
+                        <div class="info-card">
+                            <h4>Contact Persons</h4>
+                            <div class="contact-person">
+                                <strong>Sadiq</strong><br>
+                                Phone: 9740459661<br>
+                                Email: sadiqhmc83@gmail.com
+                            </div>
+                            <div class="contact-person">
+                                <strong>Munavvar Papu</strong><br>
+                                Phone: 9972200610
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <h4>Business Details</h4>
+                            <p><strong>GSTIN:</strong> 29CYPPS9466P1ZS</p>
+                            <p><strong>Location:</strong> Anavatti to Shivamogga Main Road, CHIKKAIDAGODU-577413 Soraba Tq</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </nav>
+        </section>
 
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <!-- Dashboard Tab -->
-            <section class="tab-content active" id="dashboard">
-                <div class="dashboard-grid">
-                    <!-- KPI Cards -->
-                    <div class="kpi-section">
-                        <div class="kpi-card">
-                            <div class="kpi-icon">💰</div>
-                            <div class="kpi-content">
-                                <h3 class="kpi-value">₹8,50,000</h3>
-                                <p class="kpi-label">Monthly Revenue</p>
-                                <span class="kpi-trend positive">+12% from last month</span>
-                            </div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-icon">🏭</div>
-                            <div class="kpi-content">
-                                <h3 class="kpi-value">5,000kg</h3>
-                                <p class="kpi-label">Daily Capacity</p>
-                                <span class="kpi-trend neutral">92% efficiency</span>
-                            </div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-icon">👥</div>
-                            <div class="kpi-content">
-                                <h3 class="kpi-value">45</h3>
-                                <p class="kpi-label">Active Customers</p>
-                                <span class="kpi-trend positive">+5 this month</span>
-                            </div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-icon">⭐</div>
-                            <div class="kpi-content">
-                                <h3 class="kpi-value">4.8/5.0</h3>
-                                <p class="kpi-label">Quality Rating</p>
-                                <span class="kpi-trend positive">Excellent</span>
-                            </div>
-                        </div>
+        <!-- Services Section -->
+        <section id="services" class="section section-alt">
+            <div class="container">
+                <h2 class="section-title">Our Services</h2>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="service-icon">🌶️</div>
+                        <h3>Fresh Ginger Supply</h3>
+                        <p>High-quality fresh ginger sourced directly from farms, ensuring optimal freshness and quality for our customers.</p>
                     </div>
-
-                    <!-- Revenue Chart -->
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Revenue Trends</h3>
-                            <select id="revenueTimeframe">
-                                <option>Last 6 Months</option>
-                                <option>Last Year</option>
-                            </select>
-                        </div>
-                        <div class="chart-container" style="position: relative; height: 300px;">
-                            <canvas id="revenueChart"></canvas>
-                        </div>
+                    <div class="service-card">
+                        <div class="service-icon">🏭</div>
+                        <h3>Dry Ginger Processing</h3>
+                        <p>Professional drying and processing of ginger for extended shelf life, maintaining nutritional value and flavor.</p>
                     </div>
-
-                    <!-- Processing Overview -->
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Processing Overview</h3>
-                        </div>
-                        <div class="chart-container" style="position: relative; height: 300px;">
-                            <canvas id="processingChart"></canvas>
-                        </div>
+                    <div class="service-card">
+                        <div class="service-icon">🧽</div>
+                        <h3>Ginger Washing & Cleaning</h3>
+                        <p>Thorough washing and cleaning services ensuring product hygiene and meeting food safety standards.</p>
                     </div>
-
-                    <!-- Recent Activities -->
-                    <div class="activity-card">
-                        <h3>Recent Activities</h3>
-                        <div class="activity-list" id="activityList">
-                            <!-- Activities will be populated by JavaScript -->
-                        </div>
-                    </div>
-
-                    <!-- AI Recommendations -->
-                    <div class="ai-card">
-                        <div class="ai-header">
-                            <h3>🤖 AI Recommendations</h3>
-                            <span class="ai-badge">Live</span>
-                        </div>
-                        <div class="recommendation-list" id="recommendationList">
-                            <!-- Recommendations will be populated by JavaScript -->
-                        </div>
+                    <div class="service-card">
+                        <div class="service-icon">🚛</div>
+                        <h3>Pan-India Distribution</h3>
+                        <p>Reliable supply chain covering different parts of India with timely delivery and efficient logistics management.</p>
                     </div>
                 </div>
-            </section>
-
-            <!-- Processing Tab -->
-            <section class="tab-content" id="processing">
-                <div class="processing-grid">
-                    <!-- Current Batch Info -->
-                    <div class="batch-card">
-                        <h3>Current Batch: GNG-2025-0142</h3>
-                        <div class="batch-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 78%"></div>
-                            </div>
-                            <span class="progress-text">Drying - 78% Complete</span>
-                        </div>
-                        <div class="batch-details">
-                            <div class="batch-metric">
-                                <span class="metric-label">Moisture Content</span>
-                                <span class="metric-value">8.2%</span>
-                            </div>
-                            <div class="batch-metric">
-                                <span class="metric-label">Oil Content</span>
-                                <span class="metric-value">2.4%</span>
-                            </div>
-                            <div class="batch-metric">
-                                <span class="metric-label">Grade A %</span>
-                                <span class="metric-value success">89%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Equipment Status -->
-                    <div class="equipment-card">
-                        <h3>Equipment Status</h3>
-                        <div class="equipment-list">
-                            <div class="equipment-item">
-                                <div class="equipment-info">
-                                    <span class="equipment-name">Washing Line</span>
-                                    <span class="status-badge operational">Operational</span>
-                                </div>
-                            </div>
-                            <div class="equipment-item">
-                                <div class="equipment-info">
-                                    <span class="equipment-name">Drying Chambers</span>
-                                    <span class="status-badge operational">Running</span>
-                                </div>
-                            </div>
-                            <div class="equipment-item">
-                                <div class="equipment-info">
-                                    <span class="equipment-name">Grinding Units</span>
-                                    <span class="status-badge maintenance">Maintenance</span>
-                                </div>
-                            </div>
-                            <div class="equipment-item">
-                                <div class="equipment-info">
-                                    <span class="equipment-name">Packaging Line</span>
-                                    <span class="status-badge operational">Operational</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quality Control Chart -->
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Quality Metrics Trend</h3>
-                        </div>
-                        <div class="chart-container" style="position: relative; height: 250px;">
-                            <canvas id="qualityChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Production Timeline -->
-                    <div class="timeline-card">
-                        <h3>Production Timeline</h3>
-                        <div class="timeline">
-                            <div class="timeline-item completed">
-                                <div class="timeline-marker"></div>
-                                <div class="timeline-content">
-                                    <h4>Raw Material Received</h4>
-                                    <p>2,500kg fresh ginger received and inspected</p>
-                                    <span class="timeline-time">2 days ago</span>
-                                </div>
-                            </div>
-                            <div class="timeline-item completed">
-                                <div class="timeline-marker"></div>
-                                <div class="timeline-content">
-                                    <h4>Washing & Sorting</h4>
-                                    <p>Cleaned and sorted by quality grades</p>
-                                    <span class="timeline-time">1 day ago</span>
-                                </div>
-                            </div>
-                            <div class="timeline-item active">
-                                <div class="timeline-marker"></div>
-                                <div class="timeline-content">
-                                    <h4>Drying Process</h4>
-                                    <p>Currently in drying chambers - 78% complete</p>
-                                    <span class="timeline-time">In progress</span>
-                                </div>
-                            </div>
-                            <div class="timeline-item pending">
-                                <div class="timeline-marker"></div>
-                                <div class="timeline-content">
-                                    <h4>Quality Check</h4>
-                                    <p>Final quality assessment pending</p>
-                                    <span class="timeline-time">Upcoming</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Inventory & Trading Tab -->
-            <section class="tab-content" id="inventory">
-                <div class="inventory-grid">
-                    <!-- Stock Levels -->
-                    <div class="stock-card">
-                        <h3>Current Stock Levels</h3>
-                        <div class="stock-items">
-                            <div class="stock-item">
-                                <div class="stock-info">
-                                    <h4>Fresh Ginger</h4>
-                                    <p class="stock-quantity">15,000 kg</p>
-                                </div>
-                                <div class="stock-indicator high">High</div>
-                            </div>
-                            <div class="stock-item">
-                                <div class="stock-info">
-                                    <h4>Dry Ginger</h4>
-                                    <p class="stock-quantity">3,500 kg</p>
-                                </div>
-                                <div class="stock-indicator medium">Medium</div>
-                            </div>
-                            <div class="stock-item">
-                                <div class="stock-info">
-                                    <h4>Ginger Powder</h4>
-                                    <p class="stock-quantity">850 kg</p>
-                                </div>
-                                <div class="stock-indicator low">Low</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Market Prices -->
-                    <div class="price-card">
-                        <h3>Current Market Prices</h3>
-                        <div class="price-items">
-                            <div class="price-item">
-                                <div class="price-info">
-                                    <h4>Fresh Ginger</h4>
-                                    <p class="current-price">₹85/kg</p>
-                                </div>
-                                <span class="price-trend positive">+8.5%</span>
-                            </div>
-                            <div class="price-item">
-                                <div class="price-info">
-                                    <h4>Dry Ginger</h4>
-                                    <p class="current-price">₹420/kg</p>
-                                </div>
-                                <span class="price-trend positive">+12.3%</span>
-                            </div>
-                        </div>
-                        <div class="market-alert">
-                            <span class="alert-icon">📈</span>
-                            <p>High demand expected - Consider increasing production</p>
-                        </div>
-                    </div>
-
-                    <!-- Top Customers -->
-                    <div class="customers-card">
-                        <h3>Top Customers</h3>
-                        <div class="customer-list" id="customerList">
-                            <!-- Populated by JavaScript -->
-                        </div>
-                    </div>
-
-                    <!-- Pending Orders -->
-                    <div class="orders-card">
-                        <h3>Pending Orders (23)</h3>
-                        <div class="order-summary">
-                            <div class="summary-item">
-                                <span class="summary-label">Total Value</span>
-                                <span class="summary-value">₹4,85,000</span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="summary-label">Urgent Orders</span>
-                                <span class="summary-value warning">5</span>
-                            </div>
-                        </div>
-                        <button class="btn btn--primary">View All Orders</button>
-                    </div>
-
-                    <!-- Inventory Distribution Chart -->
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Inventory Distribution</h3>
-                        </div>
-                        <div class="chart-container" style="position: relative; height: 250px;">
-                            <canvas id="inventoryChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Supplier Network -->
-                    <div class="suppliers-card">
-                        <h3>Supplier Network</h3>
-                        <div class="supplier-list" id="supplierList">
-                            <!-- Populated by JavaScript -->
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- AI Insights Tab -->
-            <section class="tab-content" id="insights">
-                <div class="insights-grid">
-                    <!-- AI Analytics Dashboard -->
-                    <div class="analytics-card">
-                        <div class="analytics-header">
-                            <h3>🤖 AI Analytics Dashboard</h3>
-                            <span class="last-updated">Last updated: 2 hours ago</span>
-                        </div>
-                        <div class="analytics-metrics">
-                            <div class="metric-item">
-                                <span class="metric-icon">📊</span>
-                                <div class="metric-content">
-                                    <h4>Processing Efficiency</h4>
-                                    <p class="metric-value">+8% improvement</p>
-                                    <p class="metric-description">Compared to last month</p>
-                                </div>
-                            </div>
-                            <div class="metric-item">
-                                <span class="metric-icon">🎯</span>
-                                <div class="metric-content">
-                                    <h4>Demand Prediction</h4>
-                                    <p class="metric-value">High accuracy</p>
-                                    <p class="metric-description">95% prediction accuracy</p>
-                                </div>
-                            </div>
-                            <div class="metric-item">
-                                <span class="metric-icon">💡</span>
-                                <div class="metric-content">
-                                    <h4>Optimization Score</h4>
-                                    <p class="metric-value">87/100</p>
-                                    <p class="metric-description">Excellent performance</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Market Prediction Chart -->
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Price Prediction (Next 3 Months)</h3>
-                        </div>
-                        <div class="chart-container" style="position: relative; height: 300px;">
-                            <canvas id="predictionChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- AI Insights List -->
-                    <div class="insights-card">
-                        <h3>🧠 AI-Generated Insights</h3>
-                        <div class="insights-list" id="insightsList">
-                            <!-- Populated by JavaScript -->
-                        </div>
-                    </div>
-
-                    <!-- Export Opportunities -->
-                    <div class="export-card">
-                        <h3>Export Opportunities</h3>
-                        <div class="opportunity-item">
-                            <div class="opportunity-flag">🇦🇪</div>
-                            <div class="opportunity-content">
-                                <h4>UAE Markets</h4>
-                                <p class="profit-margin">23% profit margin potential</p>
-                                <p class="opportunity-details">High demand for organic ginger products</p>
-                            </div>
-                            <button class="btn btn--sm btn--primary">Explore</button>
-                        </div>
-                    </div>
-
-                    <!-- Performance Benchmarks -->
-                    <div class="benchmark-card">
-                        <h3>Performance Benchmarks</h3>
-                        <div class="benchmark-list">
-                            <div class="benchmark-item">
-                                <span class="benchmark-label">Quality Score</span>
-                                <div class="benchmark-bar">
-                                    <div class="benchmark-fill" style="width: 89%"></div>
-                                </div>
-                                <span class="benchmark-value">89%</span>
-                            </div>
-                            <div class="benchmark-item">
-                                <span class="benchmark-label">Delivery Time</span>
-                                <div class="benchmark-bar">
-                                    <div class="benchmark-fill" style="width: 95%"></div>
-                                </div>
-                                <span class="benchmark-value">95%</span>
-                            </div>
-                            <div class="benchmark-item">
-                                <span class="benchmark-label">Customer Satisfaction</span>
-                                <div class="benchmark-bar">
-                                    <div class="benchmark-fill" style="width: 92%"></div>
-                                </div>
-                                <span class="benchmark-value">92%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Automated Reports -->
-                    <div class="reports-card">
-                        <h3>Automated Reports</h3>
-                        <div class="report-list">
-                            <div class="report-item">
-                                <span class="report-icon">📈</span>
-                                <div class="report-content">
-                                    <h4>Weekly Performance Report</h4>
-                                    <p>Generated automatically every Monday</p>
-                                </div>
-                                <button class="btn btn--sm btn--outline">Download</button>
-                            </div>
-                            <div class="report-item">
-                                <span class="report-icon">💰</span>
-                                <div class="report-content">
-                                    <h4>Financial Summary</h4>
-                                    <p>Monthly financial analysis and projections</p>
-                                </div>
-                                <button class="btn btn--sm btn--outline">Download</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <!-- AI Assistant Chat -->
-        <div class="ai-chat-widget" id="aiChatWidget">
-            <div class="chat-toggle" id="chatToggle">
-                <span class="chat-icon">🤖</span>
             </div>
-            <div class="chat-panel hidden" id="chatPanel">
-                <div class="chat-header">
-                    <h4>AI Assistant</h4>
-                    <button class="chat-close" id="chatClose">×</button>
-                </div>
-                <div class="chat-messages" id="chatMessages">
-                    <div class="chat-message ai">
-                        <div class="message-content">
-                            Hello! I'm your AI assistant. I can help you with business insights, processing optimization, and market analysis. How can I assist you today?
+        </section>
+
+        <!-- Invoice Section -->
+        <section id="invoice" class="section">
+            <div class="container">
+                <h2 class="section-title">Invoice Management</h2>
+                <div class="invoice-content">
+                    <div class="invoice-dashboard">
+                        <h3>Recent Invoices</h3>
+                        <div class="invoice-list">
+                            <div class="invoice-item">
+                                <div class="invoice-details">
+                                    <div class="invoice-number">Invoice #2223</div>
+                                    <div class="invoice-customer">R. D Enterprises</div>
+                                    <div class="invoice-date">31/01/2025</div>
+                                </div>
+                                <div class="invoice-amount">₹59,500</div>
+                                <button class="btn btn--sm btn--outline" onclick="viewInvoice('2223')">View</button>
+                            </div>
+                        </div>
+                        
+                        <div class="invoice-actions">
+                            <button class="btn btn--primary" id="createInvoiceBtn">Create New Invoice</button>
+                            <button class="btn btn--secondary" id="zohoIntegrationBtn">Connect to Zoho Invoice</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Zoho Integration Area -->
+                    <div class="zoho-integration">
+                        <h3>Zoho Invoice Integration</h3>
+                        <div class="integration-placeholder">
+                            <p>Connect your Zoho Invoice account to manage invoices seamlessly.</p>
+                            <div class="integration-status">
+                                <span class="status status--info">Not Connected</span>
+                            </div>
+                            <button class="btn btn--primary" id="connectZohoBtn">Connect to Zoho</button>
                         </div>
                     </div>
                 </div>
-                <div class="chat-input">
-                    <input type="text" placeholder="Ask me anything..." id="chatInput">
-                    <button id="chatSend">Send</button>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section section-alt">
+            <div class="container">
+                <h2 class="section-title">Contact Us</h2>
+                <div class="contact-content">
+                    <div class="contact-form-container">
+                        <h3>Get In Touch</h3>
+                        <form class="contact-form" id="contactForm">
+                            <div class="form-group">
+                                <label class="form-label">Name *</label>
+                                <input type="text" class="form-control" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-control" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Phone *</label>
+                                <input type="tel" class="form-control" name="phone" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Product Interest</label>
+                                <select class="form-control" name="interest">
+                                    <option value="">Select a product</option>
+                                    <option value="fresh-ginger">Fresh Ginger</option>
+                                    <option value="dry-ginger">Dry Ginger</option>
+                                    <option value="processed-ginger">Processed Ginger</option>
+                                    <option value="bulk-supply">Bulk Supply</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Message *</label>
+                                <textarea class="form-control" name="message" rows="4" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn--primary btn--full-width">Send Message</button>
+                        </form>
+                    </div>
+                    
+                    <div class="contact-info">
+                        <h3>Business Information</h3>
+                        <div class="info-card">
+                            <h4>Address</h4>
+                            <p>Anavatti to Shivamogga Main Road<br>CHIKKAIDAGODU-577413<br>Soraba Tq, Shivamogga, Karnataka</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Contact Information</h4>
+                            <p><strong>Sadiq:</strong> 9740459661</p>
+                            <p><strong>Munavvar Papu:</strong> 9972200610</p>
+                            <p><strong>Email:</strong> sadiqhmc83@gmail.com</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Business Hours</h4>
+                            <p>Monday - Saturday: 8:00 AM - 6:00 PM</p>
+                            <p>Sunday: 9:00 AM - 2:00 PM</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>GST Details</h4>
+                            <p><strong>GSTIN:</strong> 29CYPPS9466P1ZS</p>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>H.M.C. Traders</h4>
+                    <p>Fresh Ginger & Dry Ginger Merchants</p>
+                    <p>Your trusted partner for quality ginger trading solutions across India.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>📞 9740459661 / 9972200610</p>
+                    <p>✉️ sadiqhmc83@gmail.com</p>
+                    <p>📍 Chikkidagodu, Karnataka</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 H.M.C. Traders. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="modal hidden" id="loginModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Login to Invoice Dashboard</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-control" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" name="password" required>
+                </div>
+                <button type="submit" class="btn btn--primary btn--full-width">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Invoice Modal -->
+    <div class="modal hidden" id="invoiceModal">
+        <div class="modal-overlay" id="invoiceModalOverlay"></div>
+        <div class="modal-content invoice-modal-content">
+            <div class="modal-header">
+                <h3>Invoice Details</h3>
+                <button class="modal-close" id="invoiceModalClose">&times;</button>
+            </div>
+            <div class="invoice-preview" id="invoicePreview">
+                <!-- Invoice content will be populated by JavaScript -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn--primary" id="downloadInvoiceBtn">Download PDF</button>
+                <button class="btn btn--secondary" id="closeInvoiceBtn">Close</button>
             </div>
         </div>
     </div>
