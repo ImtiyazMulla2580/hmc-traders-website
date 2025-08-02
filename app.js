@@ -30,6 +30,9 @@ let invoiceCreationModal, invoiceCreationForm, closeInvoiceCreationModal, cancel
 // Invoice counter for new invoices
 let invoiceCounter = parseInt(localStorage.getItem('invoiceCounter')) || 2224;
 
+// Current invoice data for download
+let currentInvoiceData = null;
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM Content Loaded - Initializing application...');
@@ -368,6 +371,234 @@ function initializeInvoiceSystem() {
     }
 
     console.log('Invoice system initialized');
+}
+
+// Enhanced download function with multiple options
+function downloadInvoice() {
+    if (!currentInvoiceData) {
+        showNotification('No invoice data available for download.', 'error');
+        return;
+    }
+
+    try {
+        // Create a detailed HTML content for the invoice
+        const invoiceHTML = generateDownloadableInvoiceHTML(currentInvoiceData);
+        
+        // Method 1: Try to use browser's print to PDF functionality
+        downloadAsPDF(invoiceHTML, currentInvoiceData);
+        
+    } catch (error) {
+        console.error('Download error:', error);
+        showNotification('Download failed. Please try again.', 'error');
+    }
+}
+
+// Generate downloadable invoice HTML
+function generateDownloadableInvoiceHTML(invoiceData) {
+    const isCustomInvoice = invoiceData.items && invoiceData.items[0] && invoiceData.items[0].name;
+    
+    if (isCustomInvoice) {
+        return `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice ${invoiceData.invoiceNumber || invoiceData.invoiceNo}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        .invoice-header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 20px; }
+        .invoice-details { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .invoice-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .invoice-table th, .invoice-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .invoice-table th { background-color: #f2f2f2; }
+        .invoice-total { text-align: right; margin-top: 20px; }
+        .company-info { margin-bottom: 20px; }
+        @media print { body { margin: 0; } }
+    </style>
+</head>
+<body>
+    <div class="invoice-header">
+        <h1>H.M.C. Traders</h1>
+        <p>Fresh Ginger & Dry Ginger Merchants</p>
+        <p>Anavatti to Shivamogga Main Road, CHIKKAIDAGODU-577413</p>
+        <p><strong>GSTIN:</strong> 29CYPPS9466P1ZS</p>
+    </div>
+    
+    <div class="invoice-details">
+        <div>
+            <strong>Invoice No:</strong> ${invoiceData.invoiceNumber}<br>
+            <strong>Date:</strong> ${invoiceData.invoiceDate}<br>
+            ${invoiceData.vehicleNumber ? `<strong>Vehicle No:</strong> ${invoiceData.vehicleNumber}<br>` : ''}
+            ${invoiceData.placeOfSupply ? `<strong>Place of Supply:</strong> ${invoiceData.placeOfSupply}<br>` : ''}
+        </div>
+        <div>
+            <strong>Customer:</strong> ${invoiceData.customerName}<br>
+            <strong>Address:</strong> ${invoiceData.customerAddress}<br>
+            ${invoiceData.customerGSTIN ? `<strong>GSTIN:</strong> ${invoiceData.customerGSTIN}<br>` : ''}
+        </div>
+    </div>
+    
+    <table class="invoice-table">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>HSN Code</th>
+                <th>Quantity</th>
+                <th>Rate (₹)</th>
+                <th>Amount (₹)</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${invoiceData.items.map(item => `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${item.hsn}</td>
+                    <td>${item.quantity} kg</td>
+                    <td>${parseFloat(item.rate).toFixed(2)}</td>
+                    <td>${parseFloat(item.amount).toFixed(2)}</td>
+                </tr>
+            `).join('')}
+        </tbody>
+    </table>
+    
+    <div class="invoice-total">
+        <p>Subtotal: ₹${parseFloat(invoiceData.subtotal).toFixed(2)}</p>
+        <p>CGST (${invoiceData.cgstRate}%): ₹${parseFloat(invoiceData.cgstAmount).toFixed(2)}</p>
+        <p>SGST (${invoiceData.sgstRate}%): ₹${parseFloat(invoiceData.sgstAmount).toFixed(2)}</p>
+        <p><strong>Grand Total: ₹${parseFloat(invoiceData.grandTotal).toFixed(2)}</strong></p>
+        <p><em>Amount in Words: ${invoiceData.amountInWords}</em></p>
+    </div>
+    
+    <div style="margin-top: 40px; text-align: center; border-top: 1px solid #ddd; padding-top: 20px;">
+        <p>Thank you for your business!</p>
+        <p style="font-size: 12px;">Contact: 9740459661 / 9972200610 | Email: sadiqhmc83@gmail.com</p>
+    </div>
+</body>
+</html>`;
+    } else {
+        // Handle sample invoice data
+        return `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice ${invoiceData.invoiceNo}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        .invoice-header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 20px; }
+        .invoice-details { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .invoice-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .invoice-table th, .invoice-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .invoice-table th { background-color: #f2f2f2; }
+        .invoice-total { text-align: right; margin-top: 20px; }
+        @media print { body { margin: 0; } }
+    </style>
+</head>
+<body>
+    <div class="invoice-header">
+        <h1>H.M.C. Traders</h1>
+        <p>Fresh Ginger & Dry Ginger Merchants</p>
+        <p>Anavatti to Shivamogga Main Road, CHIKKAIDAGODU-577413</p>
+        <p><strong>GSTIN:</strong> 29CYPPS9466P1ZS</p>
+    </div>
+    
+    <div class="invoice-details">
+        <div>
+            <strong>Invoice No:</strong> ${invoiceData.invoiceNo}<br>
+            <strong>Date:</strong> ${invoiceData.date}
+        </div>
+        <div>
+            <strong>Customer:</strong> ${invoiceData.customer}<br>
+            <strong>Address:</strong> ${invoiceData.address}
+        </div>
+    </div>
+    
+    <table class="invoice-table">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>HSN Code</th>
+                <th>Quantity</th>
+                <th>Rate (₹)</th>
+                <th>Amount (₹)</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${invoiceData.items.map(item => `
+                <tr>
+                    <td>${item.description}</td>
+                    <td>${item.hsn}</td>
+                    <td>${item.qty}</td>
+                    <td>${item.rate}</td>
+                    <td>${item.amount}</td>
+                </tr>
+            `).join('')}
+        </tbody>
+    </table>
+    
+    <div class="invoice-total">
+        <p><strong>Total Amount: ₹${invoiceData.total}</strong></p>
+        <p><em>Amount in Words: ${invoiceData.totalWords}</em></p>
+    </div>
+    
+    <div style="margin-top: 40px; text-align: center; border-top: 1px solid #ddd; padding-top: 20px;">
+        <p>Thank you for your business!</p>
+        <p style="font-size: 12px;">Contact: 9740459661 / 9972200610 | Email: sadiqhmc83@gmail.com</p>
+    </div>
+</body>
+</html>`;
+    }
+}
+
+// Download as PDF using multiple methods
+function downloadAsPDF(htmlContent, invoiceData) {
+    const invoiceNumber = invoiceData.invoiceNumber || invoiceData.invoiceNo;
+    const filename = `HMC_Invoice_${invoiceNumber}.html`;
+    
+    try {
+        // Method 1: Create downloadable HTML file
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        showNotification('Invoice downloaded successfully! Open the HTML file and print to PDF.', 'success');
+        
+        // Method 2: Also try to open print dialog
+        setTimeout(() => {
+            if (confirm('Would you like to print the invoice now?')) {
+                printInvoice(htmlContent);
+            }
+        }, 1000);
+        
+    } catch (error) {
+        console.error('Download failed:', error);
+        
+        // Fallback: Open in new window for manual saving
+        try {
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write(htmlContent);
+            newWindow.document.close();
+            showNotification('Invoice opened in new window. Use Ctrl+P to print or save as PDF.', 'info');
+        } catch (fallbackError) {
+            console.error('Fallback also failed:', fallbackError);
+            showNotification('Download failed. Please try again or contact support.', 'error');
+        }
+    }
+}
+
+// Print invoice function
+function printInvoice(htmlContent) {
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
 }
 
 // Initialize invoice creation functionality
@@ -776,6 +1007,7 @@ function viewInvoice(invoiceId) {
     const invoiceData = sampleInvoiceData[invoiceId];
     
     if (invoiceData && invoiceModal) {
+        currentInvoiceData = invoiceData; // Set current invoice for download
         const invoicePreview = document.getElementById('invoicePreview');
         if (invoicePreview) {
             invoicePreview.innerHTML = generateInvoiceHTML(invoiceData);
@@ -792,6 +1024,7 @@ function viewCustomInvoice(invoiceNumber) {
     const invoice = savedInvoices.find(inv => inv.invoiceNumber === invoiceNumber);
     
     if (invoice && invoiceModal) {
+        currentInvoiceData = invoice; // Set current invoice for download
         const invoicePreview = document.getElementById('invoicePreview');
         if (invoicePreview) {
             invoicePreview.innerHTML = generateCustomInvoiceHTML(invoice);
@@ -925,11 +1158,6 @@ function generateCustomInvoiceHTML(invoiceData) {
             <p style="font-size: 12px;">Contact: 9740459661 / 9972200610 | Email: sadiqhmc83@gmail.com</p>
         </div>
     `;
-}
-
-// Download invoice functionality
-function downloadInvoice() {
-    showNotification('PDF download feature coming soon!', 'info');
 }
 
 // Zoho integration
