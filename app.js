@@ -1,800 +1,569 @@
-// H.M.C. Traders Website JavaScript
-
-class HMCTradersApp {
+// Professional Invoice Generator JavaScript
+class InvoiceGenerator {
     constructor() {
-        this.isLoggedIn = false;
-        this.currentSection = 'home';
-        this.invoiceCounter = 1;
-        this.items = [];
+        this.currentInvoiceNumber = this.getNextInvoiceNumber();
+        this.itemCounter = 1;
+        this.companyState = '29'; // Karnataka
         
         this.init();
     }
-
+    
     init() {
-        this.setupNavigation();
-        this.setupLogin();
-        this.setupContactForm();
-        this.setupInvoiceBuilder();
-        this.updateUI();
-        this.generateInvoiceNumber();
         this.setCurrentDate();
-        
-        // Show home section by default
-        this.showSection('home');
+        this.attachEventListeners();
+        this.loadSavedData();
+        this.updateInvoiceNumber();
     }
-
-    // Navigation System
-    setupNavigation() {
-        // Handle all navigation links
-        document.addEventListener('click', (e) => {
-            const target = e.target;
-            
-            // Handle nav links
-            if (target.classList.contains('nav-link')) {
-                e.preventDefault();
-                const href = target.getAttribute('href');
-                
-                if (href === '#login' && this.isLoggedIn) {
-                    this.logout();
-                    return;
-                }
-
-                if (href && href.startsWith('#')) {
-                    const sectionId = href.substring(1);
-                    this.showSection(sectionId);
-                }
-            }
-            
-            // Handle CTA buttons
-            if (target.textContent === 'Contact Us') {
-                e.preventDefault();
-                this.showSection('contact');
-            }
-            
-            if (target.textContent === 'Learn More') {
-                e.preventDefault();
-                this.showSection('about');
-            }
-            
-            // Handle login button in invoice access denied
-            if (target.textContent === 'Login Now') {
-                e.preventDefault();
-                this.showSection('login');
-            }
-        });
-
-        // Mobile menu toggle
-        const hamburger = document.querySelector('.hamburger');
-        const navMenu = document.querySelector('.nav-menu');
-        
-        if (hamburger) {
-            hamburger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                navMenu.classList.toggle('active');
-            });
-        }
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.navbar')) {
-                navMenu?.classList.remove('active');
-            }
-        });
-
-        // Make showSection available globally for onclick handlers
-        window.showSection = (sectionId) => this.showSection(sectionId);
-    }
-
-    showSection(sectionId) {
-        console.log('Showing section:', sectionId); // Debug log
-        
-        // Hide all sections
-        document.querySelectorAll('.section').forEach(section => {
-            section.classList.remove('active');
-        });
-
-        // Show target section
-        const targetSection = document.getElementById(sectionId);
-        if (targetSection) {
-            targetSection.classList.add('active');
-            this.currentSection = sectionId;
-            console.log('Section activated:', sectionId); // Debug log
-        } else {
-            console.error('Section not found:', sectionId);
-        }
-
-        // Update nav active state
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === `#${sectionId}`) {
-                link.classList.add('active');
-            }
-        });
-
-        // Handle invoice section access control
-        if (sectionId === 'invoice') {
-            this.updateInvoiceAccess();
-        }
-        
-        // Close mobile menu
-        const navMenu = document.querySelector('.nav-menu');
-        navMenu?.classList.remove('active');
-    }
-
-    // Login System
-    setupLogin() {
-        const loginForm = document.getElementById('loginForm');
-        
-        if (loginForm) {
-            loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.handleLogin();
-            });
-        }
-    }
-
-    handleLogin() {
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const errorDiv = document.getElementById('loginError');
-
-        // Check credentials (admin/hmc2025)
-        if (username === 'admin' && password === 'hmc2025') {
-            this.isLoggedIn = true;
-            this.updateUI();
-            this.showSection('invoice');
-            if (errorDiv) errorDiv.style.display = 'none';
-            
-            // Clear form
-            document.getElementById('loginForm').reset();
-            
-            // Show success message
-            this.showNotification('Login successful! Redirecting to invoice section.', 'success');
-        } else {
-            if (errorDiv) {
-                errorDiv.textContent = 'Invalid username or password. Use admin/hmc2025';
-                errorDiv.style.display = 'block';
-            }
-        }
-    }
-
-    logout() {
-        this.isLoggedIn = false;
-        this.updateUI();
-        this.showSection('home');
-        this.showNotification('Logged out successfully!', 'info');
-    }
-
-    showNotification(message, type = 'info') {
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = `notification notification--${type}`;
-        notification.style.cssText = `
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            background: var(--color-surface);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-base);
-            padding: var(--space-12) var(--space-16);
-            box-shadow: var(--shadow-lg);
-            z-index: 1001;
-            max-width: 300px;
-        `;
-        
-        if (type === 'success') {
-            notification.style.borderLeft = '4px solid var(--color-success)';
-        } else if (type === 'error') {
-            notification.style.borderLeft = '4px solid var(--color-error)';
-        } else {
-            notification.style.borderLeft = '4px solid var(--color-info)';
-        }
-        
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        
-        // Remove after 3 seconds
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 3000);
-    }
-
-    updateUI() {
-        const loginLink = document.querySelector('.login-link');
-        const logoutLink = document.querySelector('.logout-link');
-
-        if (this.isLoggedIn) {
-            if (loginLink) loginLink.style.display = 'none';
-            if (logoutLink) {
-                logoutLink.style.display = 'block';
-                logoutLink.textContent = 'Logout';
-            }
-        } else {
-            if (loginLink) loginLink.style.display = 'block';
-            if (logoutLink) logoutLink.style.display = 'none';
-        }
-    }
-
-    updateInvoiceAccess() {
-        const accessDenied = document.getElementById('invoiceAccessDenied');
-        const invoiceContent = document.getElementById('invoiceContent');
-
-        if (this.isLoggedIn) {
-            if (accessDenied) accessDenied.style.display = 'none';
-            if (invoiceContent) invoiceContent.style.display = 'block';
-        } else {
-            if (accessDenied) accessDenied.style.display = 'block';
-            if (invoiceContent) invoiceContent.style.display = 'none';
-        }
-    }
-
-    // Contact Form
-    setupContactForm() {
-        const contactForm = document.getElementById('contactForm');
-        
-        if (contactForm) {
-            contactForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.showNotification('Thank you for your message! We will get back to you soon.', 'success');
-                contactForm.reset();
-            });
-        }
-    }
-
-    // Invoice Builder
-    setupInvoiceBuilder() {
-        this.setupInvoiceForm();
-        this.setupItemManagement();
-        this.setupInvoiceActions();
-        this.updateInvoicePreview();
-    }
-
-    generateInvoiceNumber() {
-        const invoiceNoField = document.getElementById('invoiceNo');
-        if (invoiceNoField) {
-            const currentDate = new Date();
-            const year = currentDate.getFullYear().toString().substr(-2);
-            const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-            const invoiceNo = `HMC/${year}${month}/${this.invoiceCounter.toString().padStart(4, '0')}`;
-            invoiceNoField.value = invoiceNo;
-        }
-    }
-
+    
     setCurrentDate() {
         const today = new Date().toISOString().split('T')[0];
-        const invoiceDateField = document.getElementById('invoiceDate');
-        const supplyDateField = document.getElementById('supplyDate');
-        
-        if (invoiceDateField) invoiceDateField.value = today;
-        if (supplyDateField) supplyDateField.value = today;
+        document.getElementById('invoiceDate').value = today;
+        document.getElementById('supplyDate').value = today;
     }
-
-    setupInvoiceForm() {
-        const form = document.getElementById('invoiceForm');
-        if (!form) return;
-        
-        const inputs = form.querySelectorAll('input, select, textarea');
-
-        inputs.forEach(input => {
-            input.addEventListener('input', () => {
-                this.updateInvoicePreview();
-            });
+    
+    getNextInvoiceNumber() {
+        const savedNumber = localStorage.getItem('hmcLastInvoiceNumber');
+        return savedNumber ? parseInt(savedNumber) + 1 : 1001;
+    }
+    
+    updateInvoiceNumber() {
+        document.getElementById('invoiceNumber').value = `HMC-${this.currentInvoiceNumber}`;
+    }
+    
+    attachEventListeners() {
+        // Item calculation listeners
+        document.addEventListener('input', (e) => {
+            if (e.target.classList.contains('item-quantity') || 
+                e.target.classList.contains('item-rate') ||
+                e.target.classList.contains('item-tax')) {
+                this.calculateItemAmount(e.target);
+                this.calculateTotals();
+            }
         });
+        
+        // Customer state change listener
+        document.getElementById('customerState').addEventListener('change', () => {
+            this.calculateTotals();
+        });
+        
+        // Auto-save on input changes
+        document.addEventListener('input', this.debounce(() => {
+            this.autoSave();
+        }, 1000));
     }
-
-    setupItemManagement() {
-        const addItemBtn = document.getElementById('addItem');
+    
+    addNewItem() {
+        this.itemCounter++;
+        const tbody = document.getElementById('itemsTableBody');
+        const newRow = this.createItemRow(this.itemCounter);
+        tbody.appendChild(newRow);
         
-        if (addItemBtn) {
-            addItemBtn.addEventListener('click', () => {
-                this.addItem();
-            });
-        }
-
-        // Setup initial item calculations
-        this.setupItemCalculations();
+        // Focus on the new item description
+        const newDescInput = newRow.querySelector('.item-description');
+        newDescInput.focus();
     }
-
-    addItem() {
-        const itemsContainer = document.getElementById('itemsContainer');
-        if (!itemsContainer) return;
+    
+    createItemRow(rowNumber) {
+        const row = document.createElement('tr');
+        row.className = 'item-row';
+        row.setAttribute('data-row', rowNumber);
         
-        const itemCount = itemsContainer.children.length;
-        
-        const itemRow = document.createElement('div');
-        itemRow.className = 'item-row';
-        itemRow.dataset.index = itemCount;
-        
-        itemRow.innerHTML = `
-            <div class="form-row">
-                <div class="form-group small">
-                    <label class="form-label">SL No</label>
-                    <input type="number" class="form-control" value="${itemCount + 1}" readonly>
-                </div>
-                <div class="form-group large">
-                    <label class="form-label">Particulars</label>
-                    <input type="text" class="form-control item-description" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">HSN Code</label>
-                    <input type="text" class="form-control item-hsn">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Tax %</label>
-                    <input type="number" class="form-control item-tax" step="0.01" value="18">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Quantity</label>
-                    <input type="number" class="form-control item-quantity" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Rate</label>
-                    <input type="number" class="form-control item-rate" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Amount</label>
-                    <input type="number" class="form-control item-amount" readonly>
-                </div>
-                <div class="form-group">
-                    <button type="button" class="btn remove-item">Remove</button>
-                </div>
-            </div>
+        row.innerHTML = `
+            <td class="serial-number">${rowNumber}</td>
+            <td>
+                <input type="text" class="form-control item-description" placeholder="Enter item description">
+            </td>
+            <td>
+                <select class="form-control item-hsn">
+                    <option value="">Select HSN</option>
+                    <option value="0910.11">0910.11 - Ginger (Fresh)</option>
+                    <option value="0910.12">0910.12 - Ginger (Processed)</option>
+                    <option value="2008.99">2008.99 - Preserved Fruits</option>
+                    <option value="0910">0910 - Spices</option>
+                </select>
+            </td>
+            <td>
+                <select class="form-control item-tax">
+                    <option value="0">0%</option>
+                    <option value="5">5%</option>
+                    <option value="12">12%</option>
+                    <option value="18">18%</option>
+                    <option value="28">28%</option>
+                </select>
+            </td>
+            <td>
+                <input type="number" class="form-control item-quantity" min="0" step="0.01" placeholder="0">
+            </td>
+            <td>
+                <input type="number" class="form-control item-rate" min="0" step="0.01" placeholder="0.00">
+            </td>
+            <td class="item-amount">₹0.00</td>
+            <td>
+                <button class="btn-remove" onclick="removeItem(${rowNumber})">🗑️</button>
+            </td>
         `;
-
-        itemsContainer.appendChild(itemRow);
-        this.setupItemRowEvents(itemRow);
-        this.updateInvoicePreview();
-    }
-
-    setupItemCalculations() {
-        const itemRows = document.querySelectorAll('.item-row');
-        itemRows.forEach(row => {
-            this.setupItemRowEvents(row);
-        });
-    }
-
-    setupItemRowEvents(row) {
-        const quantityInput = row.querySelector('.item-quantity');
-        const rateInput = row.querySelector('.item-rate');
-        const amountInput = row.querySelector('.item-amount');
-        const removeBtn = row.querySelector('.remove-item');
-
-        const calculateAmount = () => {
-            const quantity = parseFloat(quantityInput.value) || 0;
-            const rate = parseFloat(rateInput.value) || 0;
-            const amount = quantity * rate;
-            amountInput.value = amount.toFixed(2);
-            this.updateInvoicePreview();
-        };
-
-        if (quantityInput) quantityInput.addEventListener('input', calculateAmount);
-        if (rateInput) rateInput.addEventListener('input', calculateAmount);
-
-        // Add input event listeners for preview updates
-        row.querySelectorAll('input').forEach(input => {
-            input.addEventListener('input', () => {
-                this.updateInvoicePreview();
-            });
-        });
-
-        if (removeBtn) {
-            removeBtn.addEventListener('click', () => {
-                if (document.querySelectorAll('.item-row').length > 1) {
-                    row.remove();
-                    this.reindexItems();
-                    this.updateInvoicePreview();
-                } else {
-                    this.showNotification('At least one item is required', 'error');
-                }
-            });
-        }
-    }
-
-    reindexItems() {
-        const itemRows = document.querySelectorAll('.item-row');
-        itemRows.forEach((row, index) => {
-            row.dataset.index = index;
-            const slNoInput = row.querySelector('input[readonly]');
-            if (slNoInput) slNoInput.value = index + 1;
-        });
-    }
-
-    updateInvoicePreview() {
-        const preview = document.getElementById('invoicePreview');
-        if (!preview) return;
         
-        const invoiceData = this.collectInvoiceData();
-        preview.innerHTML = this.generateInvoiceHTML(invoiceData);
+        return row;
     }
-
-    collectInvoiceData() {
-        const data = {
-            type: this.getFieldValue('invoiceType') || 'CASH',
-            invoiceNo: this.getFieldValue('invoiceNo'),
-            date: this.getFieldValue('invoiceDate'),
-            transportMode: this.getFieldValue('transportMode'),
-            vehicleNumber: this.getFieldValue('vehicleNumber'),
-            supplyDate: this.getFieldValue('supplyDate'),
-            placeOfSupply: this.getFieldValue('placeOfSupply'),
-            eWayBill: this.getFieldValue('eWayBill'),
-            customerName: this.getFieldValue('customerName'),
-            customerAddress: this.getFieldValue('customerAddress'),
-            customerGstin: this.getFieldValue('customerGstin'),
-            customerState: this.getFieldValue('customerState'),
-            items: [],
-            totals: {
-                netAmount: 0,
-                cgst: 0,
-                sgst: 0,
-                igst: 0,
-                grandTotal: 0
-            }
-        };
-
-        // Collect items
-        const itemRows = document.querySelectorAll('.item-row');
-        itemRows.forEach((row, index) => {
-            const item = {
-                slNo: index + 1,
-                description: this.getRowFieldValue(row, '.item-description'),
-                hsn: this.getRowFieldValue(row, '.item-hsn'),
-                tax: parseFloat(this.getRowFieldValue(row, '.item-tax')) || 0,
-                quantity: parseFloat(this.getRowFieldValue(row, '.item-quantity')) || 0,
-                rate: parseFloat(this.getRowFieldValue(row, '.item-rate')) || 0,
-                amount: parseFloat(this.getRowFieldValue(row, '.item-amount')) || 0
-            };
+    
+    calculateItemAmount(changedElement) {
+        const row = changedElement.closest('.item-row');
+        const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+        const rate = parseFloat(row.querySelector('.item-rate').value) || 0;
+        const amount = quantity * rate;
+        
+        row.querySelector('.item-amount').textContent = `₹${amount.toFixed(2)}`;
+    }
+    
+    calculateTotals() {
+        const items = document.querySelectorAll('.item-row');
+        let netAmount = 0;
+        let totalCGST = 0;
+        let totalSGST = 0;
+        let totalIGST = 0;
+        
+        const customerState = document.getElementById('customerState').value;
+        const isInterState = customerState && customerState !== this.companyState;
+        
+        items.forEach(item => {
+            const quantity = parseFloat(item.querySelector('.item-quantity').value) || 0;
+            const rate = parseFloat(item.querySelector('.item-rate').value) || 0;
+            const taxRate = parseFloat(item.querySelector('.item-tax').value) || 0;
+            const itemAmount = quantity * rate;
             
-            if (item.description && item.quantity && item.rate) {
-                data.items.push(item);
-            }
-        });
-
-        // Calculate totals
-        data.totals.netAmount = data.items.reduce((sum, item) => sum + item.amount, 0);
-        
-        // Calculate taxes
-        if (data.items.length > 0) {
-            const avgTaxRate = data.items.reduce((sum, item) => sum + item.tax, 0) / data.items.length;
+            netAmount += itemAmount;
             
-            if (data.customerState && data.customerState.toLowerCase().includes('karnataka')) {
-                // Same state - CGST + SGST
-                data.totals.cgst = (data.totals.netAmount * avgTaxRate / 2) / 100;
-                data.totals.sgst = (data.totals.netAmount * avgTaxRate / 2) / 100;
-            } else {
-                // Different state - IGST
-                data.totals.igst = (data.totals.netAmount * avgTaxRate) / 100;
-            }
-        }
-        
-        data.totals.grandTotal = data.totals.netAmount + data.totals.cgst + data.totals.sgst + data.totals.igst;
-
-        return data;
-    }
-
-    getFieldValue(fieldId) {
-        const field = document.getElementById(fieldId);
-        return field ? field.value : '';
-    }
-
-    getRowFieldValue(row, selector) {
-        const field = row.querySelector(selector);
-        return field ? field.value : '';
-    }
-
-    generateInvoiceHTML(data) {
-        const formatDate = (dateStr) => {
-            if (!dateStr) return '';
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('en-IN');
-        };
-
-        const formatCurrency = (amount) => {
-            return amount.toFixed(2);
-        };
-
-        return `
-            <div class="invoice-header">
-                <h1>H.M.C. TRADERS</h1>
-                <h2>Fresh Ginger & Dry Ginger Merchants</h2>
-                <p>Annavatti to Shivamogga Main Road, CHIKKAIDAGODU-577413 Soraba Tq</p>
-                <p>GSTIN: 29CYPPS9466P1ZS | Contact: 9972987867, 9740459661</p>
-                <h3 style="color: var(--ginger-orange); margin-top: 16px;">${data.type} BILL</h3>
-            </div>
-
-            <div class="invoice-details">
-                <div>
-                    <strong>Invoice Details</strong>
-                    <p>Invoice No: ${data.invoiceNo}</p>
-                    <p>Date: ${formatDate(data.date)}</p>
-                    <p>Transportation: ${data.transportMode}</p>
-                    <p>Vehicle No: ${data.vehicleNumber}</p>
-                </div>
-                <div>
-                    <strong>Supply Details</strong>
-                    <p>Date of Supply: ${formatDate(data.supplyDate)}</p>
-                    <p>State: Karnataka : 29</p>
-                    <p>Place of Supply: ${data.placeOfSupply}</p>
-                    <p>E-Way Bill: ${data.eWayBill}</p>
-                </div>
-            </div>
-
-            <div class="invoice-details">
-                <div>
-                    <strong>Bill To</strong>
-                    <p><strong>${data.customerName}</strong></p>
-                    <p>${data.customerAddress}</p>
-                    <p>GSTIN: ${data.customerGstin}</p>
-                    <p>State: ${data.customerState}</p>
-                </div>
-                <div>
-                    <strong>Bill From</strong>
-                    <p><strong>H.M.C. TRADERS</strong></p>
-                    <p>Annavatti to Shivamogga Main Road<br>CHIKKAIDAGODU-577413<br>Soraba Tq, Karnataka</p>
-                    <p>GSTIN: 29CYPPS9466P1ZS</p>
-                </div>
-            </div>
-
-            <table class="invoice-table">
-                <thead>
-                    <tr>
-                        <th>SL NO</th>
-                        <th>Particulars</th>
-                        <th>HSN Code</th>
-                        <th>Rate of Tax %</th>
-                        <th>Quantity</th>
-                        <th>Rate Rs. Ps.</th>
-                        <th>Amount Rs. Ps.</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${data.items.map(item => `
-                        <tr>
-                            <td>${item.slNo}</td>
-                            <td>${item.description}</td>
-                            <td>${item.hsn}</td>
-                            <td>${item.tax}%</td>
-                            <td>${item.quantity}</td>
-                            <td>${formatCurrency(item.rate)}</td>
-                            <td>${formatCurrency(item.amount)}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-
-            <div class="invoice-totals">
-                <table>
-                    <tr>
-                        <td>Net Amount:</td>
-                        <td>₹ ${formatCurrency(data.totals.netAmount)}</td>
-                    </tr>
-                    ${data.totals.cgst > 0 ? `
-                    <tr>
-                        <td>CGST @ ${data.items.length > 0 ? (data.items[0].tax / 2) : 0}%:</td>
-                        <td>₹ ${formatCurrency(data.totals.cgst)}</td>
-                    </tr>
-                    <tr>
-                        <td>SGST @ ${data.items.length > 0 ? (data.items[0].tax / 2) : 0}%:</td>
-                        <td>₹ ${formatCurrency(data.totals.sgst)}</td>
-                    </tr>
-                    ` : ''}
-                    ${data.totals.igst > 0 ? `
-                    <tr>
-                        <td>IGST @ ${data.items.length > 0 ? data.items[0].tax : 0}%:</td>
-                        <td>₹ ${formatCurrency(data.totals.igst)}</td>
-                    </tr>
-                    ` : ''}
-                    <tr class="total-row">
-                        <td><strong>Grand Total:</strong></td>
-                        <td><strong>₹ ${formatCurrency(data.totals.grandTotal)}</strong></td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="invoice-footer">
-                <p><strong>Rupees in Words:</strong> ${this.numberToWords(data.totals.grandTotal)} Only</p>
+            if (itemAmount > 0 && taxRate > 0) {
+                const taxAmount = (itemAmount * taxRate) / 100;
                 
-                <div class="terms">
-                    <h4>Terms & Conditions</h4>
-                    <p>• Good once sold cannot be taken back or exchanged</p>
-                    <p>• If bill is not cleared 30 day 2% Interest will be charged</p>
-                </div>
-
-                <div class="signatures">
-                    <div class="signature">
-                        <strong>Party Signatory</strong>
-                    </div>
-                    <div class="signature">
-                        <strong>Authorized Signatory</strong><br>
-                        <strong>H.M.C. TRADERS</strong>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    setupInvoiceActions() {
-        const saveAsPdfBtn = document.getElementById('saveAsPdf');
-        const printInvoiceBtn = document.getElementById('printInvoice');
-
-        if (saveAsPdfBtn) {
-            saveAsPdfBtn.addEventListener('click', () => {
-                this.saveAsPDF();
-            });
-        }
-
-        if (printInvoiceBtn) {
-            printInvoiceBtn.addEventListener('click', () => {
-                this.printInvoice();
-            });
-        }
-    }
-
-    saveAsPDF() {
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF();
-        const invoiceData = this.collectInvoiceData();
-
-        // PDF content
-        let yPosition = 20;
+                if (isInterState) {
+                    totalIGST += taxAmount;
+                } else {
+                    totalCGST += taxAmount / 2;
+                    totalSGST += taxAmount / 2;
+                }
+            }
+        });
         
-        // Header
-        pdf.setFontSize(20);
-        pdf.setFont(undefined, 'bold');
-        pdf.text('H.M.C. TRADERS', 105, yPosition, { align: 'center' });
+        // Update display
+        document.getElementById('netAmount').textContent = `₹${netAmount.toFixed(2)}`;
         
-        yPosition += 8;
-        pdf.setFontSize(14);
-        pdf.text('Fresh Ginger & Dry Ginger Merchants', 105, yPosition, { align: 'center' });
+        // Show/hide tax rows based on transaction type
+        const cgstRow = document.getElementById('cgstRow');
+        const sgstRow = document.getElementById('sgstRow');
+        const igstRow = document.getElementById('igstRow');
         
-        yPosition += 6;
-        pdf.setFontSize(10);
-        pdf.setFont(undefined, 'normal');
-        pdf.text('Annavatti to Shivamogga Main Road, CHIKKAIDAGODU-577413 Soraba Tq', 105, yPosition, { align: 'center' });
-        
-        yPosition += 4;
-        pdf.text('GSTIN: 29CYPPS9466P1ZS | Contact: 9972987867, 9740459661', 105, yPosition, { align: 'center' });
-        
-        yPosition += 10;
-        pdf.setFontSize(16);
-        pdf.setFont(undefined, 'bold');
-        pdf.text(`${invoiceData.type} BILL`, 105, yPosition, { align: 'center' });
-        
-        yPosition += 15;
-        
-        // Invoice details
-        pdf.setFontSize(10);
-        pdf.setFont(undefined, 'normal');
-        pdf.text(`Invoice No: ${invoiceData.invoiceNo}`, 20, yPosition);
-        pdf.text(`Date: ${invoiceData.date}`, 120, yPosition);
-        
-        yPosition += 8;
-        pdf.text(`Customer: ${invoiceData.customerName}`, 20, yPosition);
-        
-        yPosition += 6;
-        pdf.text(`Address: ${invoiceData.customerAddress}`, 20, yPosition);
-        
-        yPosition += 15;
-        
-        // Items table
-        if (invoiceData.items.length > 0) {
-            // Table headers
-            pdf.setFont(undefined, 'bold');
-            pdf.text('SL', 20, yPosition);
-            pdf.text('Particulars', 35, yPosition);
-            pdf.text('Qty', 120, yPosition);
-            pdf.text('Rate', 140, yPosition);
-            pdf.text('Amount', 170, yPosition);
+        if (isInterState && totalIGST > 0) {
+            igstRow.style.display = 'flex';
+            cgstRow.style.display = 'none';
+            sgstRow.style.display = 'none';
             
-            yPosition += 8;
-            pdf.setFont(undefined, 'normal');
+            document.getElementById('igstPercent').textContent = this.getAverageTaxRate(items);
+            document.getElementById('igstAmount').textContent = `₹${totalIGST.toFixed(2)}`;
+        } else if (!isInterState && (totalCGST > 0 || totalSGST > 0)) {
+            cgstRow.style.display = 'flex';
+            sgstRow.style.display = 'flex';
+            igstRow.style.display = 'none';
             
-            // Items
-            invoiceData.items.forEach((item, index) => {
-                pdf.text((index + 1).toString(), 20, yPosition);
-                pdf.text(item.description.substring(0, 30), 35, yPosition);
-                pdf.text(item.quantity.toString(), 120, yPosition);
-                pdf.text(item.rate.toFixed(2), 140, yPosition);
-                pdf.text(item.amount.toFixed(2), 170, yPosition);
-                yPosition += 6;
-            });
-            
-            yPosition += 10;
-            
-            // Totals
-            pdf.setFont(undefined, 'bold');
-            pdf.text(`Grand Total: ₹ ${invoiceData.totals.grandTotal.toFixed(2)}`, 120, yPosition);
-            
-            yPosition += 10;
-            pdf.setFont(undefined, 'normal');
-            pdf.text(`Amount in Words: ${this.numberToWords(invoiceData.totals.grandTotal)} Only`, 20, yPosition);
+            const avgTaxRate = this.getAverageTaxRate(items) / 2;
+            document.getElementById('cgstPercent').textContent = avgTaxRate.toFixed(1);
+            document.getElementById('sgstPercent').textContent = avgTaxRate.toFixed(1);
+            document.getElementById('cgstAmount').textContent = `₹${totalCGST.toFixed(2)}`;
+            document.getElementById('sgstAmount').textContent = `₹${totalSGST.toFixed(2)}`;
+        } else {
+            cgstRow.style.display = 'none';
+            sgstRow.style.display = 'none';
+            igstRow.style.display = 'none';
         }
         
-        // Save the PDF
-        const filename = `Invoice_${invoiceData.invoiceNo.replace(/\//g, '_')}.pdf`;
-        pdf.save(filename);
-        this.showNotification(`PDF saved as ${filename}`, 'success');
+        const grandTotal = netAmount + totalCGST + totalSGST + totalIGST;
+        document.getElementById('grandTotal').textContent = `₹${grandTotal.toFixed(2)}`;
+        
+        // Update amount in words
+        document.getElementById('amountInWords').textContent = this.numberToWords(grandTotal);
     }
-
-    printInvoice() {
-        this.showNotification('Opening print dialog...', 'info');
-        setTimeout(() => {
-            window.print();
-        }, 500);
+    
+    getAverageTaxRate(items) {
+        let totalTaxRate = 0;
+        let itemsWithTax = 0;
+        
+        items.forEach(item => {
+            const quantity = parseFloat(item.querySelector('.item-quantity').value) || 0;
+            const rate = parseFloat(item.querySelector('.item-rate').value) || 0;
+            const taxRate = parseFloat(item.querySelector('.item-tax').value) || 0;
+            
+            if (quantity > 0 && rate > 0 && taxRate > 0) {
+                totalTaxRate += taxRate;
+                itemsWithTax++;
+            }
+        });
+        
+        return itemsWithTax > 0 ? totalTaxRate / itemsWithTax : 0;
     }
-
-    numberToWords(num) {
-        if (num === 0) return 'Zero';
+    
+    numberToWords(amount) {
+        if (amount === 0) return 'Zero Rupees Only';
         
         const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
         const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
         const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-        const thousands = ['', 'Thousand', 'Lakh', 'Crore'];
         
-        function convertHundreds(n) {
+        function convertBelowThousand(num) {
             let result = '';
             
-            if (n >= 100) {
-                result += ones[Math.floor(n / 100)] + ' Hundred ';
-                n %= 100;
+            if (num >= 100) {
+                result += ones[Math.floor(num / 100)] + ' Hundred ';
+                num %= 100;
             }
             
-            if (n >= 20) {
-                result += tens[Math.floor(n / 10)] + ' ';
-                n %= 10;
-            } else if (n >= 10) {
-                result += teens[n - 10] + ' ';
+            if (num >= 20) {
+                result += tens[Math.floor(num / 10)] + ' ';
+                num %= 10;
+            } else if (num >= 10) {
+                result += teens[num - 10] + ' ';
                 return result;
             }
             
-            if (n > 0) {
-                result += ones[n] + ' ';
+            if (num > 0) {
+                result += ones[num] + ' ';
             }
             
             return result;
         }
         
-        const integerPart = Math.floor(num);
-        const decimalPart = Math.round((num - integerPart) * 100);
+        let rupees = Math.floor(amount);
+        let paise = Math.round((amount - rupees) * 100);
         
         let result = '';
-        let groupIndex = 0;
         
-        if (integerPart === 0) {
-            result = 'Zero ';
-        } else {
-            while (integerPart > 0) {
-                let group;
-                
-                if (groupIndex === 0) {
-                    group = integerPart % 1000;
-                    integerPart = Math.floor(integerPart / 1000);
-                } else {
-                    group = integerPart % 100;
-                    integerPart = Math.floor(integerPart / 100);
-                }
-                
-                if (group !== 0) {
-                    result = convertHundreds(group) + thousands[groupIndex] + ' ' + result;
-                }
-                
-                groupIndex++;
-            }
+        if (rupees >= 10000000) {
+            result += convertBelowThousand(Math.floor(rupees / 10000000)) + 'Crore ';
+            rupees %= 10000000;
+        }
+        
+        if (rupees >= 100000) {
+            result += convertBelowThousand(Math.floor(rupees / 100000)) + 'Lakh ';
+            rupees %= 100000;
+        }
+        
+        if (rupees >= 1000) {
+            result += convertBelowThousand(Math.floor(rupees / 1000)) + 'Thousand ';
+            rupees %= 1000;
+        }
+        
+        if (rupees > 0) {
+            result += convertBelowThousand(rupees);
         }
         
         result += 'Rupees';
         
-        if (decimalPart > 0) {
-            result += ' and ' + convertHundreds(decimalPart) + 'Paise';
+        if (paise > 0) {
+            result += ' and ' + convertBelowThousand(paise) + 'Paise';
         }
         
-        return result.trim();
+        return result + ' Only';
+    }
+    
+    validateForm() {
+        const requiredFields = [
+            { id: 'customerName', name: 'Customer Name' },
+            { id: 'invoiceDate', name: 'Invoice Date' }
+        ];
+        
+        const errors = [];
+        
+        requiredFields.forEach(field => {
+            const element = document.getElementById(field.id);
+            if (!element.value.trim()) {
+                errors.push(field.name);
+                element.style.borderColor = '#DC2626';
+            } else {
+                element.style.borderColor = '';
+            }
+        });
+        
+        // Check if at least one item exists with quantity and rate
+        const items = document.querySelectorAll('.item-row');
+        let validItems = 0;
+        
+        items.forEach(item => {
+            const quantity = parseFloat(item.querySelector('.item-quantity').value) || 0;
+            const rate = parseFloat(item.querySelector('.item-rate').value) || 0;
+            if (quantity > 0 && rate > 0) validItems++;
+        });
+        
+        if (validItems === 0) {
+            errors.push('At least one item with quantity and rate');
+        }
+        
+        if (errors.length > 0) {
+            alert('Please fill in the following required fields:\n• ' + errors.join('\n• '));
+            return false;
+        }
+        
+        return true;
+    }
+    
+    collectInvoiceData() {
+        const items = [];
+        document.querySelectorAll('.item-row').forEach(row => {
+            const description = row.querySelector('.item-description').value;
+            const hsn = row.querySelector('.item-hsn').value;
+            const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+            const rate = parseFloat(row.querySelector('.item-rate').value) || 0;
+            const tax = parseFloat(row.querySelector('.item-tax').value) || 0;
+            
+            if (description || quantity > 0 || rate > 0) {
+                items.push({ description, hsn, quantity, rate, tax, amount: quantity * rate });
+            }
+        });
+        
+        return {
+            invoiceNumber: document.getElementById('invoiceNumber').value,
+            invoiceType: document.getElementById('invoiceType').value,
+            invoiceDate: document.getElementById('invoiceDate').value,
+            supplyDate: document.getElementById('supplyDate').value,
+            transportMode: document.getElementById('transportMode').value,
+            vehicleNumber: document.getElementById('vehicleNumber').value,
+            placeOfSupply: document.getElementById('placeOfSupply').value,
+            eWayBill: document.getElementById('eWayBill').value,
+            customerName: document.getElementById('customerName').value,
+            customerAddress: document.getElementById('customerAddress').value,
+            customerGSTIN: document.getElementById('customerGSTIN').value,
+            customerState: document.getElementById('customerState').value,
+            items: items,
+            netAmount: document.getElementById('netAmount').textContent,
+            grandTotal: document.getElementById('grandTotal').textContent,
+            amountInWords: document.getElementById('amountInWords').textContent
+        };
+    }
+    
+    saveInvoice() {
+        if (!this.validateForm()) return;
+        
+        const invoiceData = this.collectInvoiceData();
+        const invoiceKey = `invoice_${invoiceData.invoiceNumber}`;
+        
+        try {
+            localStorage.setItem(invoiceKey, JSON.stringify(invoiceData));
+            localStorage.setItem('hmcLastInvoiceNumber', this.currentInvoiceNumber.toString());
+            
+            this.showSuccessMessage('Invoice saved successfully!');
+            
+            // Increment invoice number for next invoice
+            this.currentInvoiceNumber++;
+            this.updateInvoiceNumber();
+            
+        } catch (error) {
+            alert('Error saving invoice. Please try again.');
+            console.error('Save error:', error);
+        }
+    }
+    
+    autoSave() {
+        if (document.getElementById('customerName').value.trim()) {
+            const invoiceData = this.collectInvoiceData();
+            localStorage.setItem('hmcDraftInvoice', JSON.stringify(invoiceData));
+        }
+    }
+    
+    loadSavedData() {
+        const draftData = localStorage.getItem('hmcDraftInvoice');
+        if (draftData) {
+            try {
+                const data = JSON.parse(draftData);
+                this.populateForm(data);
+            } catch (error) {
+                console.error('Error loading draft:', error);
+            }
+        }
+    }
+    
+    populateForm(data) {
+        // Don't populate invoice number and dates for drafts
+        if (data.customerName) document.getElementById('customerName').value = data.customerName;
+        if (data.customerAddress) document.getElementById('customerAddress').value = data.customerAddress;
+        if (data.customerGSTIN) document.getElementById('customerGSTIN').value = data.customerGSTIN;
+        if (data.customerState) document.getElementById('customerState').value = data.customerState;
+        if (data.transportMode) document.getElementById('transportMode').value = data.transportMode;
+        if (data.vehicleNumber) document.getElementById('vehicleNumber').value = data.vehicleNumber;
+        if (data.placeOfSupply) document.getElementById('placeOfSupply').value = data.placeOfSupply;
+        if (data.eWayBill) document.getElementById('eWayBill').value = data.eWayBill;
+        
+        // Populate items
+        if (data.items && data.items.length > 0) {
+            const tbody = document.getElementById('itemsTableBody');
+            tbody.innerHTML = ''; // Clear existing items
+            
+            data.items.forEach((item, index) => {
+                const row = this.createItemRow(index + 1);
+                row.querySelector('.item-description').value = item.description || '';
+                row.querySelector('.item-hsn').value = item.hsn || '';
+                row.querySelector('.item-quantity').value = item.quantity || '';
+                row.querySelector('.item-rate').value = item.rate || '';
+                row.querySelector('.item-tax').value = item.tax || '';
+                tbody.appendChild(row);
+            });
+            
+            this.itemCounter = data.items.length;
+            this.calculateTotals();
+        }
+    }
+    
+    resetForm() {
+        if (confirm('Are you sure you want to reset the form? All data will be lost.')) {
+            location.reload();
+        }
+    }
+    
+    printInvoice() {
+        if (!this.validateForm()) return;
+        
+        // Hide action buttons and remove buttons before printing
+        const actionBar = document.querySelector('.action-bar');
+        const removeButtons = document.querySelectorAll('.btn-remove');
+        
+        actionBar.style.display = 'none';
+        removeButtons.forEach(btn => btn.style.display = 'none');
+        
+        window.print();
+        
+        // Restore buttons after printing
+        setTimeout(() => {
+            actionBar.style.display = 'block';
+            removeButtons.forEach(btn => btn.style.display = 'block');
+        }, 1000);
+    }
+    
+    async generatePDF() {
+        if (!this.validateForm()) return;
+        
+        try {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            
+            // Hide action elements
+            const actionBar = document.querySelector('.action-bar');
+            const removeButtons = document.querySelectorAll('.btn-remove');
+            
+            actionBar.style.display = 'none';
+            removeButtons.forEach(btn => btn.style.display = 'none');
+            
+            // Generate PDF from HTML
+            const invoiceElement = document.getElementById('invoiceContainer');
+            
+            const canvas = await html2canvas(invoiceElement, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                width: invoiceElement.offsetWidth,
+                height: invoiceElement.offsetHeight
+            });
+            
+            const imgData = canvas.toDataURL('image/png');
+            const imgWidth = 210; // A4 width in mm
+            const pageHeight = 295; // A4 height in mm
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+            
+            let position = 0;
+            
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+            
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+            
+            // Save PDF
+            const fileName = `Invoice_${document.getElementById('invoiceNumber').value}.pdf`;
+            pdf.save(fileName);
+            
+            // Restore elements
+            actionBar.style.display = 'block';
+            removeButtons.forEach(btn => btn.style.display = 'block');
+            
+            this.showSuccessMessage('PDF generated successfully!');
+            
+        } catch (error) {
+            alert('Error generating PDF. Please try again.');
+            console.error('PDF generation error:', error);
+            
+            // Restore elements on error
+            document.querySelector('.action-bar').style.display = 'block';
+            document.querySelectorAll('.btn-remove').forEach(btn => btn.style.display = 'block');
+        }
+    }
+    
+    showSuccessMessage(message) {
+        const messageElement = document.getElementById('successMessage');
+        messageElement.querySelector('.alert-text').textContent = message;
+        messageElement.classList.remove('hidden');
+        
+        setTimeout(() => {
+            messageElement.classList.add('hidden');
+        }, 3000);
+    }
+    
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
     }
 }
 
-// Initialize the application
+// Global functions for HTML onclick handlers
+function addNewItem() {
+    invoiceGenerator.addNewItem();
+}
+
+function removeItem(rowNumber) {
+    const row = document.querySelector(`[data-row="${rowNumber}"]`);
+    if (row) {
+        row.remove();
+        invoiceGenerator.calculateTotals();
+        
+        // Update serial numbers
+        const remainingRows = document.querySelectorAll('.item-row');
+        remainingRows.forEach((row, index) => {
+            row.querySelector('.serial-number').textContent = index + 1;
+            row.setAttribute('data-row', index + 1);
+            
+            // Update remove button onclick
+            const removeBtn = row.querySelector('.btn-remove');
+            removeBtn.setAttribute('onclick', `removeItem(${index + 1})`);
+        });
+        
+        invoiceGenerator.itemCounter = remainingRows.length;
+    }
+}
+
+function saveInvoice() {
+    invoiceGenerator.saveInvoice();
+}
+
+function printInvoice() {
+    invoiceGenerator.printInvoice();
+}
+
+function generatePDF() {
+    invoiceGenerator.generatePDF();
+}
+
+function resetForm() {
+    invoiceGenerator.resetForm();
+}
+
+// Initialize the invoice generator when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Initializing H.M.C. Traders App...');
-    new HMCTradersApp();
+    window.invoiceGenerator = new InvoiceGenerator();
 });
