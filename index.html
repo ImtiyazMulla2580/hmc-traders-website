@@ -3,319 +3,280 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>H.M.C. Traders - Ginger Merchants</title>
+    <title>Professional Invoice Generator | H.M.C. Traders</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-brand">
-                <h2>H.M.C. TRADERS</h2>
-                <span>Ginger Merchants</span>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="#home" class="nav-link active">Home</a></li>
-                <li><a href="#about" class="nav-link">About</a></li>
-                <li><a href="#contact" class="nav-link">Contact</a></li>
-                <li><a href="#invoice" class="nav-link">Invoice</a></li>
-                <li><a href="#login" class="nav-link login-link">Login</a></li>
-                <li><a href="#" class="nav-link logout-link" style="display: none;">Logout</a></li>
-            </ul>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
+    <div class="container">
+        <!-- Action Buttons -->
+        <div class="action-bar">
+            <div class="action-buttons">
+                <button class="btn btn--primary" onclick="generatePDF()">
+                    📄 Download PDF
+                </button>
+                <button class="btn btn--secondary" onclick="printInvoice()">
+                    🖨️ Print
+                </button>
+                <button class="btn btn--outline" onclick="saveInvoice()">
+                    💾 Save
+                </button>
+                <button class="btn btn--outline" onclick="resetForm()">
+                    🔄 Reset
+                </button>
             </div>
         </div>
-    </nav>
 
-    <!-- Home Section -->
-    <section id="home" class="section active">
-        <div class="hero">
-            <div class="container">
-                <div class="hero-content">
-                    <h1>Welcome to H.M.C. Traders</h1>
-                    <p class="hero-subtitle">Premium Fresh & Dry Ginger Merchants</p>
-                    <p class="hero-description">Leading suppliers of quality processed ginger across India. We specialize in washing, cleaning, and distributing the finest ginger products from Karnataka.</p>
-                    <div class="hero-features">
-                        <div class="feature">
-                            <h3>Quality Processing</h3>
-                            <p>State-of-the-art washing and cleaning facilities</p>
-                        </div>
-                        <div class="feature">
-                            <h3>Pan India Supply</h3>
-                            <p>Reliable distribution network across multiple states</p>
-                        </div>
-                        <div class="feature">
-                            <h3>Fresh & Dry Ginger</h3>
-                            <p>Complete range of ginger products for all needs</p>
-                        </div>
+        <!-- Invoice Container -->
+        <div class="invoice-container" id="invoiceContainer">
+            <!-- Header Section -->
+            <header class="invoice-header">
+                <div class="company-info">
+                    <div class="logo-section">
+                        <div class="logo-placeholder">🏢</div>
                     </div>
-                    <div class="hero-cta">
-                        <button class="btn btn--primary" onclick="showSection('contact')">Contact Us</button>
-                        <button class="btn btn--outline" onclick="showSection('about')">Learn More</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="section">
-        <div class="container">
-            <h2>About H.M.C. Traders</h2>
-            <div class="about-content">
-                <div class="about-text">
-                    <p>H.M.C. Traders is a leading ginger processing and trading company based in Karnataka, India. We specialize in the procurement, processing, and distribution of fresh and dry ginger across various states in India.</p>
-                    
-                    <p>Our state-of-the-art washing and processing facilities ensure the highest quality standards for our products. Located at Annavatti to Shivamogga Main Road, CHIKKAIDAGODU-577413 Soraba Tq, Karnataka, we are strategically positioned to serve customers across the region.</p>
-
-                    <h3>Our Mission</h3>
-                    <p>To provide the highest quality ginger products while maintaining sustainable and ethical trading practices that benefit both our customers and local farming communities.</p>
-
-                    <h3>Our Services</h3>
-                    <ul class="services-list">
-                        <li>Fresh Ginger Processing</li>
-                        <li>Dry Ginger Production</li>
-                        <li>Quality Washing & Cleaning</li>
-                        <li>Bulk Supply & Distribution</li>
-                        <li>Interstate Transportation</li>
-                    </ul>
-
                     <div class="company-details">
-                        <h3>Company Details</h3>
-                        <p><strong>GSTIN:</strong> 29CYPPS9466P1ZS</p>
-                        <p><strong>Contacts:</strong> Sadiq (9740459661), Munavar (9972200610)</p>
-                        <p><strong>Email:</strong> sadiqhmc83@gmail.com</p>
+                        <h1 class="company-name">H.M.C. TRADERS</h1>
+                        <p class="company-tagline">Ginger Merchants</p>
+                        <div class="company-address">
+                            <p>Annavatti to Shivamogga Main Road</p>
+                            <p>CHIKKAIDAGODU-577413 Soraba Tq</p>
+                            <p><strong>GSTIN:</strong> 29CYPPS9466P1ZS</p>
+                            <p><strong>Contact:</strong> 9972987867, 9740459661</p>
+                            <p><strong>Email:</strong> sadiqhmc83@gmail.com</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
+                <div class="invoice-title">
+                    <h2>TAX INVOICE</h2>
+                </div>
+            </header>
 
-    <!-- Contact Section -->
-    <section id="contact" class="section">
-        <div class="container">
-            <h2>Contact Us</h2>
-            <div class="contact-content">
-                <div class="contact-info">
-                    <h3>Get in Touch</h3>
-                    <div class="contact-item">
-                        <strong>Address:</strong>
-                        <p>Annavatti to Shivamogga Main Road<br>CHIKKAIDAGODU-577413<br>Soraba Tq, Karnataka</p>
+            <!-- Invoice Details Grid -->
+            <section class="invoice-details-grid">
+                <div class="invoice-info-card">
+                    <h3>Invoice Details</h3>
+                    <div class="form-group">
+                        <label class="form-label">Invoice Type</label>
+                        <select class="form-control" id="invoiceType">
+                            <option value="CASH">CASH BILL</option>
+                            <option value="CREDIT">CREDIT BILL</option>
+                        </select>
                     </div>
-                    <div class="contact-item">
-                        <strong>Phone:</strong>
-                        <p>9972987867, 9740459661</p>
+                    <div class="form-group">
+                        <label class="form-label">Invoice Number</label>
+                        <input type="text" class="form-control" id="invoiceNumber" value="HMC-1001" readonly>
                     </div>
-                    <div class="contact-item">
-                        <strong>Email:</strong>
-                        <p>sadiqhmc83@gmail.com</p>
-                    </div>
-                    <div class="contact-item">
-                        <strong>Business Hours:</strong>
-                        <p>Monday - Saturday: 9:00 AM - 6:00 PM<br>Sunday: Closed</p>
+                    <div class="form-group">
+                        <label class="form-label">Invoice Date</label>
+                        <input type="date" class="form-control" id="invoiceDate" required>
                     </div>
                 </div>
-                <div class="contact-form">
-                    <h3>Send us a Message</h3>
-                    <form id="contactForm">
-                        <div class="form-group">
-                            <label class="form-label">Name</label>
-                            <input type="text" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Phone</label>
-                            <input type="tel" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Subject</label>
-                            <input type="text" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Message</label>
-                            <textarea class="form-control" rows="5" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn--primary">Send Message</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Login Section -->
-    <section id="login" class="section">
-        <div class="container">
-            <div class="login-container">
-                <div class="card">
-                    <div class="card__body">
-                        <h2>Login</h2>
-                        <p>Please login to access the invoice system</p>
-                        <form id="loginForm">
+                <div class="transport-info-card">
+                    <h3>Transport Details</h3>
+                    <div class="form-group">
+                        <label class="form-label">Transportation Mode</label>
+                        <input type="text" class="form-control" id="transportMode" placeholder="Road/Rail/Air">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Vehicle Number</label>
+                        <input type="text" class="form-control" id="vehicleNumber" placeholder="KA-20-AB-1234">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Date of Supply</label>
+                        <input type="date" class="form-control" id="supplyDate">
+                    </div>
+                </div>
+
+                <div class="supply-info-card">
+                    <h3>Supply Details</h3>
+                    <div class="form-group">
+                        <label class="form-label">State</label>
+                        <input type="text" class="form-control" value="Karnataka : 29" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Place of Supply</label>
+                        <input type="text" class="form-control" id="placeOfSupply" placeholder="City, State">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">E-Way Bill No</label>
+                        <input type="text" class="form-control" id="eWayBill" placeholder="Optional">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Customer Information -->
+            <section class="customer-section">
+                <div class="customer-card">
+                    <h3>Bill To</h3>
+                    <div class="customer-form">
+                        <div class="form-group">
+                            <label class="form-label">Customer Name *</label>
+                            <input type="text" class="form-control" id="customerName" placeholder="Enter customer name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Customer Address</label>
+                            <textarea class="form-control" id="customerAddress" rows="3" placeholder="Enter customer address"></textarea>
+                        </div>
+                        <div class="customer-form-row">
                             <div class="form-group">
-                                <label class="form-label">Username</label>
-                                <input type="text" id="username" class="form-control" required>
+                                <label class="form-label">Customer GSTIN</label>
+                                <input type="text" class="form-control" id="customerGSTIN" placeholder="Optional">
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Password</label>
-                                <input type="password" id="password" class="form-control" required>
+                                <label class="form-label">Customer State</label>
+                                <select class="form-control" id="customerState">
+                                    <option value="">Select State</option>
+                                    <option value="29">Karnataka</option>
+                                    <option value="27">Maharashtra</option>
+                                    <option value="33">Tamil Nadu</option>
+                                    <option value="32">Kerala</option>
+                                    <option value="36">Telangana</option>
+                                    <option value="37">Andhra Pradesh</option>
+                                    <option value="24">Gujarat</option>
+                                    <option value="08">Rajasthan</option>
+                                    <option value="09">Uttar Pradesh</option>
+                                    <option value="10">Bihar</option>
+                                </select>
                             </div>
-                            <button type="submit" class="btn btn--primary btn--full-width">Login</button>
-                        </form>
-                        <div id="loginError" class="error-message" style="display: none;"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
+            </section>
 
-    <!-- Invoice Section -->
-    <section id="invoice" class="section">
-        <div class="container">
-            <div class="invoice-access-denied" id="invoiceAccessDenied">
-                <div class="card">
-                    <div class="card__body text-center">
-                        <h2>Access Restricted</h2>
-                        <p>Please login to access the invoice system</p>
-                        <button class="btn btn--primary" onclick="showSection('login')">Login Now</button>
-                    </div>
+            <!-- Items Table -->
+            <section class="items-section">
+                <div class="items-header">
+                    <h3>Items</h3>
+                    <button class="btn btn--sm btn--primary" onclick="addNewItem()">+ Add Item</button>
                 </div>
-            </div>
-            
-            <div class="invoice-content" id="invoiceContent" style="display: none;">
-                <h2>Invoice Builder</h2>
-                <div class="invoice-builder">
-                    <div class="invoice-form">
-                        <h3>Invoice Details</h3>
-                        <form id="invoiceForm">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">Invoice Type</label>
-                                    <select class="form-control" id="invoiceType">
-                                        <option value="CASH">CASH BILL</option>
-                                        <option value="CREDIT">CREDIT BILL</option>
+                
+                <div class="table-container">
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Particulars/Description</th>
+                                <th>HSN Code</th>
+                                <th>Tax %</th>
+                                <th>Qty</th>
+                                <th>Rate (₹)</th>
+                                <th>Amount (₹)</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTableBody">
+                            <tr class="item-row" data-row="1">
+                                <td class="serial-number">1</td>
+                                <td>
+                                    <input type="text" class="form-control item-description" placeholder="Enter item description">
+                                </td>
+                                <td>
+                                    <select class="form-control item-hsn">
+                                        <option value="">Select HSN</option>
+                                        <option value="0910.11">0910.11 - Ginger (Fresh)</option>
+                                        <option value="0910.12">0910.12 - Ginger (Processed)</option>
+                                        <option value="2008">2008 - Preserved Fruits</option>
                                     </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Invoice No</label>
-                                    <input type="text" class="form-control" id="invoiceNo" required>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Date</label>
-                                    <input type="date" class="form-control" id="invoiceDate" required>
-                                </div>
-                            </div>
+                                </td>
+                                <td>
+                                    <select class="form-control item-tax">
+                                        <option value="0">0%</option>
+                                        <option value="5">5%</option>
+                                        <option value="12">12%</option>
+                                        <option value="18">18%</option>
+                                        <option value="28">28%</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control item-quantity" min="0" step="0.01" placeholder="0">
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control item-rate" min="0" step="0.01" placeholder="0.00">
+                                </td>
+                                <td class="item-amount">₹0.00</td>
+                                <td>
+                                    <button class="btn-remove" onclick="removeItem(1)">🗑️</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">Transportation Mode</label>
-                                    <input type="text" class="form-control" id="transportMode">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Vehicle Number</label>
-                                    <input type="text" class="form-control" id="vehicleNumber">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Date of Supply</label>
-                                    <input type="date" class="form-control" id="supplyDate">
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">Place of Supply</label>
-                                    <input type="text" class="form-control" id="placeOfSupply">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">E-Way Bill No</label>
-                                    <input type="text" class="form-control" id="eWayBill">
-                                </div>
-                            </div>
-
-                            <h4>Customer Details</h4>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">Customer Name</label>
-                                    <input type="text" class="form-control" id="customerName" required>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Customer GSTIN</label>
-                                    <input type="text" class="form-control" id="customerGstin">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Customer State</label>
-                                    <input type="text" class="form-control" id="customerState">
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label">Customer Address</label>
-                                <textarea class="form-control" id="customerAddress" rows="3" required></textarea>
-                            </div>
-
-                            <h4>Items</h4>
-                            <div id="itemsContainer">
-                                <div class="item-row" data-index="0">
-                                    <div class="form-row">
-                                        <div class="form-group small">
-                                            <label class="form-label">SL No</label>
-                                            <input type="number" class="form-control" value="1" readonly>
-                                        </div>
-                                        <div class="form-group large">
-                                            <label class="form-label">Particulars</label>
-                                            <input type="text" class="form-control item-description" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label">HSN Code</label>
-                                            <input type="text" class="form-control item-hsn">
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label">Tax %</label>
-                                            <input type="number" class="form-control item-tax" step="0.01">
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label">Quantity</label>
-                                            <input type="number" class="form-control item-quantity" step="0.01" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label">Rate</label>
-                                            <input type="number" class="form-control item-rate" step="0.01" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label">Amount</label>
-                                            <input type="number" class="form-control item-amount" readonly>
-                                        </div>
-                                        <div class="form-group">
-                                            <button type="button" class="btn btn--secondary remove-item">Remove</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn--outline" id="addItem">Add Item</button>
-
-                            <div class="form-actions">
-                                <button type="button" class="btn btn--primary" id="saveAsPdf">Save as PDF</button>
-                                <button type="button" class="btn btn--secondary" id="printInvoice">Print Invoice</button>
-                            </div>
-                        </form>
+            <!-- Calculations -->
+            <section class="calculations-section">
+                <div class="calculations-card">
+                    <div class="calculation-row">
+                        <span class="calc-label">Net Amount:</span>
+                        <span class="calc-value" id="netAmount">₹0.00</span>
                     </div>
+                    <div class="calculation-row" id="cgstRow" style="display: none;">
+                        <span class="calc-label">CGST @ <span id="cgstPercent">0</span>%:</span>
+                        <span class="calc-value" id="cgstAmount">₹0.00</span>
+                    </div>
+                    <div class="calculation-row" id="sgstRow" style="display: none;">
+                        <span class="calc-label">SGST @ <span id="sgstPercent">0</span>%:</span>
+                        <span class="calc-value" id="sgstAmount">₹0.00</span>
+                    </div>
+                    <div class="calculation-row" id="igstRow" style="display: none;">
+                        <span class="calc-label">IGST @ <span id="igstPercent">0</span>%:</span>
+                        <span class="calc-value" id="igstAmount">₹0.00</span>
+                    </div>
+                    <div class="calculation-row grand-total">
+                        <span class="calc-label">Grand Total:</span>
+                        <span class="calc-value" id="grandTotal">₹0.00</span>
+                    </div>
+                    <div class="amount-words">
+                        <p><strong>Amount in Words:</strong> <span id="amountInWords">Zero Rupees Only</span></p>
+                    </div>
+                </div>
+            </section>
 
-                    <div class="invoice-preview">
-                        <h3>Invoice Preview</h3>
-                        <div id="invoicePreview" class="invoice-document">
-                            <!-- Invoice preview will be generated here -->
+            <!-- Terms and Conditions -->
+            <section class="terms-section">
+                <div class="terms-card">
+                    <h3>Terms and Conditions</h3>
+                    <ul class="terms-list">
+                        <li>Good once sold cannot be taken back or exchanged</li>
+                        <li>If bill is not cleared within 30 days, 2% interest will be charged</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Signature Section -->
+            <section class="signature-section">
+                <div class="signature-card">
+                    <div class="signature-left">
+                        <div class="signature-box">
+                            <p class="signature-label">Party Signatory</p>
+                            <div class="signature-line"></div>
+                        </div>
+                    </div>
+                    <div class="signature-right">
+                        <div class="company-stamp">
+                            <p class="stamp-label">Company Stamp</p>
+                        </div>
+                        <div class="signature-box">
+                            <p class="signature-label">Authorized Signatory</p>
+                            <div class="signature-line"></div>
                         </div>
                     </div>
                 </div>
+            </section>
+        </div>
+
+        <!-- Success Message -->
+        <div class="success-message hidden" id="successMessage">
+            <div class="alert-content">
+                <span class="alert-icon">✅</span>
+                <span class="alert-text">Invoice saved successfully!</span>
             </div>
         </div>
-    </section>
+    </div>
 
     <script src="app.js"></script>
 </body>

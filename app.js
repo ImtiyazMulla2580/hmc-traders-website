@@ -10,9 +10,9 @@ class InvoiceGenerator {
     
     init() {
         this.setCurrentDate();
+        this.updateInvoiceNumber();
         this.attachEventListeners();
         this.loadSavedData();
-        this.updateInvoiceNumber();
     }
     
     setCurrentDate() {
@@ -31,25 +31,41 @@ class InvoiceGenerator {
     }
     
     attachEventListeners() {
-        // Item calculation listeners
+        // Item calculation listeners - using event delegation for dynamic rows
         document.addEventListener('input', (e) => {
-            if (e.target.classList.contains('item-quantity') || 
-                e.target.classList.contains('item-rate') ||
-                e.target.classList.contains('item-tax')) {
+            if (e.target.matches('.item-quantity, .item-rate, .item-tax')) {
                 this.calculateItemAmount(e.target);
                 this.calculateTotals();
             }
         });
         
         // Customer state change listener
-        document.getElementById('customerState').addEventListener('change', () => {
-            this.calculateTotals();
-        });
+        const customerStateSelect = document.getElementById('customerState');
+        if (customerStateSelect) {
+            customerStateSelect.addEventListener('change', () => {
+                this.calculateTotals();
+            });
+        }
         
         // Auto-save on input changes
         document.addEventListener('input', this.debounce(() => {
             this.autoSave();
         }, 1000));
+        
+        // Form validation listeners
+        document.addEventListener('blur', (e) => {
+            if (e.target.hasAttribute('required')) {
+                this.validateField(e.target);
+            }
+        }, true);
+    }
+    
+    validateField(field) {
+        if (field.value.trim() === '') {
+            field.style.borderColor = '#DC2626';
+        } else {
+            field.style.borderColor = '';
+        }
     }
     
     addNewItem() {
@@ -60,7 +76,12 @@ class InvoiceGenerator {
         
         // Focus on the new item description
         const newDescInput = newRow.querySelector('.item-description');
-        newDescInput.focus();
+        if (newDescInput) {
+            newDescInput.focus();
+        }
+        
+        // Update row numbers for all rows
+        this.updateRowNumbers();
     }
     
     createItemRow(rowNumber) {
@@ -71,7 +92,7 @@ class InvoiceGenerator {
         row.innerHTML = `
             <td class="serial-number">${rowNumber}</td>
             <td>
-                <input type="text" class="form-control item-description" placeholder="Enter item description">
+                <input type="text" class="form-control item-description" placeholder="Enter item description" value="">
             </td>
             <td>
                 <select class="form-control item-hsn">
@@ -92,27 +113,50 @@ class InvoiceGenerator {
                 </select>
             </td>
             <td>
-                <input type="number" class="form-control item-quantity" min="0" step="0.01" placeholder="0">
+                <input type="number" class="form-control item-quantity" min="0" step="0.01" placeholder="0" value="">
             </td>
             <td>
-                <input type="number" class="form-control item-rate" min="0" step="0.01" placeholder="0.00">
+                <input type="number" class="form-control item-rate" min="0" step="0.01" placeholder="0.00" value="">
             </td>
             <td class="item-amount">₹0.00</td>
             <td>
-                <button class="btn-remove" onclick="removeItem(${rowNumber})">🗑️</button>
+                <button type="button" class="btn-remove" onclick="removeItem(${rowNumber})">🗑️</button>
             </td>
         `;
         
         return row;
     }
     
+    updateRowNumbers() {
+        const rows = document.querySelectorAll('.item-row');
+        rows.forEach((row, index) => {
+            const newRowNumber = index + 1;
+            row.setAttribute('data-row', newRowNumber);
+            row.querySelector('.serial-number').textContent = newRowNumber;
+            const removeBtn = row.querySelector('.btn-remove');
+            if (removeBtn) {
+                removeBtn.setAttribute('onclick', `removeItem(${newRowNumber})`);
+            }
+        });
+        this.itemCounter = rows.length;
+    }
+    
     calculateItemAmount(changedElement) {
         const row = changedElement.closest('.item-row');
-        const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
-        const rate = parseFloat(row.querySelector('.item-rate').value) || 0;
+        if (!row) return;
+        
+        const quantityInput = row.querySelector('.item-quantity');
+        const rateInput = row.querySelector('.item-rate');
+        const amountCell = row.querySelector('.item-amount');
+        
+        const quantity = parseFloat(quantityInput.value) || 0;
+        const rate = parseFloat(rateInput.value) || 0;
         const amount = quantity * rate;
         
-        row.querySelector('.item-amount').textContent = `₹${amount.toFixed(2)}`;
+        amountCell.textContent = `₹${amount.toFixed(2)}`;
+        
+        // Trigger total calculation
+        setTimeout(() => this.calculateTotals(), 10);
     }
     
     calculateTotals() {
@@ -122,13 +166,19 @@ class InvoiceGenerator {
         let totalSGST = 0;
         let totalIGST = 0;
         
-        const customerState = document.getElementById('customerState').value;
+        const customerStateSelect = document.getElementById('customerState');
+        const customerState = customerStateSelect ? customerStateSelect.value : '';
         const isInterState = customerState && customerState !== this.companyState;
         
+        // Calculate amounts for each item
         items.forEach(item => {
-            const quantity = parseFloat(item.querySelector('.item-quantity').value) || 0;
-            const rate = parseFloat(item.querySelector('.item-rate').value) || 0;
-            const taxRate = parseFloat(item.querySelector('.item-tax').value) || 0;
+            const quantityInput = item.querySelector('.item-quantity');
+            const rateInput = item.querySelector('.item-rate');
+            const taxSelect = item.querySelector('.item-tax');
+            
+            const quantity = parseFloat(quantityInput?.value) || 0;
+            const rate = parseFloat(rateInput?.value) || 0;
+            const taxRate = parseFloat(taxSelect?.value) || 0;
             const itemAmount = quantity * rate;
             
             netAmount += itemAmount;
@@ -146,7 +196,10 @@ class InvoiceGenerator {
         });
         
         // Update display
-        document.getElementById('netAmount').textContent = `₹${netAmount.toFixed(2)}`;
+        const netAmountElement = document.getElementById('netAmount');
+        if (netAmountElement) {
+            netAmountElement.textContent = `₹${netAmount.toFixed(2)}`;
+        }
         
         // Show/hide tax rows based on transaction type
         const cgstRow = document.getElementById('cgstRow');
@@ -154,33 +207,46 @@ class InvoiceGenerator {
         const igstRow = document.getElementById('igstRow');
         
         if (isInterState && totalIGST > 0) {
-            igstRow.style.display = 'flex';
-            cgstRow.style.display = 'none';
-            sgstRow.style.display = 'none';
+            if (igstRow) igstRow.style.display = 'flex';
+            if (cgstRow) cgstRow.style.display = 'none';
+            if (sgstRow) sgstRow.style.display = 'none';
             
-            document.getElementById('igstPercent').textContent = this.getAverageTaxRate(items);
-            document.getElementById('igstAmount').textContent = `₹${totalIGST.toFixed(2)}`;
+            const igstPercent = document.getElementById('igstPercent');
+            const igstAmount = document.getElementById('igstAmount');
+            if (igstPercent) igstPercent.textContent = this.getAverageTaxRate(items);
+            if (igstAmount) igstAmount.textContent = `₹${totalIGST.toFixed(2)}`;
         } else if (!isInterState && (totalCGST > 0 || totalSGST > 0)) {
-            cgstRow.style.display = 'flex';
-            sgstRow.style.display = 'flex';
-            igstRow.style.display = 'none';
+            if (cgstRow) cgstRow.style.display = 'flex';
+            if (sgstRow) sgstRow.style.display = 'flex';
+            if (igstRow) igstRow.style.display = 'none';
             
             const avgTaxRate = this.getAverageTaxRate(items) / 2;
-            document.getElementById('cgstPercent').textContent = avgTaxRate.toFixed(1);
-            document.getElementById('sgstPercent').textContent = avgTaxRate.toFixed(1);
-            document.getElementById('cgstAmount').textContent = `₹${totalCGST.toFixed(2)}`;
-            document.getElementById('sgstAmount').textContent = `₹${totalSGST.toFixed(2)}`;
+            const cgstPercent = document.getElementById('cgstPercent');
+            const sgstPercent = document.getElementById('sgstPercent');
+            const cgstAmount = document.getElementById('cgstAmount');
+            const sgstAmount = document.getElementById('sgstAmount');
+            
+            if (cgstPercent) cgstPercent.textContent = avgTaxRate.toFixed(1);
+            if (sgstPercent) sgstPercent.textContent = avgTaxRate.toFixed(1);
+            if (cgstAmount) cgstAmount.textContent = `₹${totalCGST.toFixed(2)}`;
+            if (sgstAmount) sgstAmount.textContent = `₹${totalSGST.toFixed(2)}`;
         } else {
-            cgstRow.style.display = 'none';
-            sgstRow.style.display = 'none';
-            igstRow.style.display = 'none';
+            if (cgstRow) cgstRow.style.display = 'none';
+            if (sgstRow) sgstRow.style.display = 'none';
+            if (igstRow) igstRow.style.display = 'none';
         }
         
         const grandTotal = netAmount + totalCGST + totalSGST + totalIGST;
-        document.getElementById('grandTotal').textContent = `₹${grandTotal.toFixed(2)}`;
+        const grandTotalElement = document.getElementById('grandTotal');
+        if (grandTotalElement) {
+            grandTotalElement.textContent = `₹${grandTotal.toFixed(2)}`;
+        }
         
         // Update amount in words
-        document.getElementById('amountInWords').textContent = this.numberToWords(grandTotal);
+        const amountInWordsElement = document.getElementById('amountInWords');
+        if (amountInWordsElement) {
+            amountInWordsElement.textContent = this.numberToWords(grandTotal);
+        }
     }
     
     getAverageTaxRate(items) {
@@ -188,9 +254,13 @@ class InvoiceGenerator {
         let itemsWithTax = 0;
         
         items.forEach(item => {
-            const quantity = parseFloat(item.querySelector('.item-quantity').value) || 0;
-            const rate = parseFloat(item.querySelector('.item-rate').value) || 0;
-            const taxRate = parseFloat(item.querySelector('.item-tax').value) || 0;
+            const quantityInput = item.querySelector('.item-quantity');
+            const rateInput = item.querySelector('.item-rate');
+            const taxSelect = item.querySelector('.item-tax');
+            
+            const quantity = parseFloat(quantityInput?.value) || 0;
+            const rate = parseFloat(rateInput?.value) || 0;
+            const taxRate = parseFloat(taxSelect?.value) || 0;
             
             if (quantity > 0 && rate > 0 && taxRate > 0) {
                 totalTaxRate += taxRate;
@@ -274,9 +344,9 @@ class InvoiceGenerator {
         
         requiredFields.forEach(field => {
             const element = document.getElementById(field.id);
-            if (!element.value.trim()) {
+            if (!element || !element.value.trim()) {
                 errors.push(field.name);
-                element.style.borderColor = '#DC2626';
+                if (element) element.style.borderColor = '#DC2626';
             } else {
                 element.style.borderColor = '';
             }
@@ -287,8 +357,10 @@ class InvoiceGenerator {
         let validItems = 0;
         
         items.forEach(item => {
-            const quantity = parseFloat(item.querySelector('.item-quantity').value) || 0;
-            const rate = parseFloat(item.querySelector('.item-rate').value) || 0;
+            const quantityInput = item.querySelector('.item-quantity');
+            const rateInput = item.querySelector('.item-rate');
+            const quantity = parseFloat(quantityInput?.value) || 0;
+            const rate = parseFloat(rateInput?.value) || 0;
             if (quantity > 0 && rate > 0) validItems++;
         });
         
@@ -306,35 +378,53 @@ class InvoiceGenerator {
     
     collectInvoiceData() {
         const items = [];
-        document.querySelectorAll('.item-row').forEach(row => {
-            const description = row.querySelector('.item-description').value;
-            const hsn = row.querySelector('.item-hsn').value;
-            const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
-            const rate = parseFloat(row.querySelector('.item-rate').value) || 0;
-            const tax = parseFloat(row.querySelector('.item-tax').value) || 0;
+        const itemRows = document.querySelectorAll('.item-row');
+        
+        itemRows.forEach(row => {
+            const descInput = row.querySelector('.item-description');
+            const hsnSelect = row.querySelector('.item-hsn');
+            const quantityInput = row.querySelector('.item-quantity');
+            const rateInput = row.querySelector('.item-rate');
+            const taxSelect = row.querySelector('.item-tax');
+            
+            const description = descInput?.value || '';
+            const hsn = hsnSelect?.value || '';
+            const quantity = parseFloat(quantityInput?.value) || 0;
+            const rate = parseFloat(rateInput?.value) || 0;
+            const tax = parseFloat(taxSelect?.value) || 0;
             
             if (description || quantity > 0 || rate > 0) {
                 items.push({ description, hsn, quantity, rate, tax, amount: quantity * rate });
             }
         });
         
+        const getElementValue = (id) => {
+            const element = document.getElementById(id);
+            return element ? element.value : '';
+        };
+        
+        const getElementText = (id) => {
+            const element = document.getElementById(id);
+            return element ? element.textContent : '';
+        };
+        
         return {
-            invoiceNumber: document.getElementById('invoiceNumber').value,
-            invoiceType: document.getElementById('invoiceType').value,
-            invoiceDate: document.getElementById('invoiceDate').value,
-            supplyDate: document.getElementById('supplyDate').value,
-            transportMode: document.getElementById('transportMode').value,
-            vehicleNumber: document.getElementById('vehicleNumber').value,
-            placeOfSupply: document.getElementById('placeOfSupply').value,
-            eWayBill: document.getElementById('eWayBill').value,
-            customerName: document.getElementById('customerName').value,
-            customerAddress: document.getElementById('customerAddress').value,
-            customerGSTIN: document.getElementById('customerGSTIN').value,
-            customerState: document.getElementById('customerState').value,
+            invoiceNumber: getElementValue('invoiceNumber'),
+            invoiceType: getElementValue('invoiceType'),
+            invoiceDate: getElementValue('invoiceDate'),
+            supplyDate: getElementValue('supplyDate'),
+            transportMode: getElementValue('transportMode'),
+            vehicleNumber: getElementValue('vehicleNumber'),
+            placeOfSupply: getElementValue('placeOfSupply'),
+            eWayBill: getElementValue('eWayBill'),
+            customerName: getElementValue('customerName'),
+            customerAddress: getElementValue('customerAddress'),
+            customerGSTIN: getElementValue('customerGSTIN'),
+            customerState: getElementValue('customerState'),
             items: items,
-            netAmount: document.getElementById('netAmount').textContent,
-            grandTotal: document.getElementById('grandTotal').textContent,
-            amountInWords: document.getElementById('amountInWords').textContent
+            netAmount: getElementText('netAmount'),
+            grandTotal: getElementText('grandTotal'),
+            amountInWords: getElementText('amountInWords')
         };
     }
     
@@ -361,57 +451,78 @@ class InvoiceGenerator {
     }
     
     autoSave() {
-        if (document.getElementById('customerName').value.trim()) {
+        const customerNameInput = document.getElementById('customerName');
+        if (customerNameInput && customerNameInput.value.trim()) {
             const invoiceData = this.collectInvoiceData();
-            localStorage.setItem('hmcDraftInvoice', JSON.stringify(invoiceData));
-        }
-    }
-    
-    loadSavedData() {
-        const draftData = localStorage.getItem('hmcDraftInvoice');
-        if (draftData) {
             try {
-                const data = JSON.parse(draftData);
-                this.populateForm(data);
+                localStorage.setItem('hmcDraftInvoice', JSON.stringify(invoiceData));
             } catch (error) {
-                console.error('Error loading draft:', error);
+                console.error('Auto-save error:', error);
             }
         }
     }
     
+    loadSavedData() {
+        try {
+            const draftData = localStorage.getItem('hmcDraftInvoice');
+            if (draftData) {
+                const data = JSON.parse(draftData);
+                this.populateForm(data);
+            }
+        } catch (error) {
+            console.error('Error loading draft:', error);
+        }
+    }
+    
     populateForm(data) {
+        const setElementValue = (id, value) => {
+            const element = document.getElementById(id);
+            if (element && value) element.value = value;
+        };
+        
         // Don't populate invoice number and dates for drafts
-        if (data.customerName) document.getElementById('customerName').value = data.customerName;
-        if (data.customerAddress) document.getElementById('customerAddress').value = data.customerAddress;
-        if (data.customerGSTIN) document.getElementById('customerGSTIN').value = data.customerGSTIN;
-        if (data.customerState) document.getElementById('customerState').value = data.customerState;
-        if (data.transportMode) document.getElementById('transportMode').value = data.transportMode;
-        if (data.vehicleNumber) document.getElementById('vehicleNumber').value = data.vehicleNumber;
-        if (data.placeOfSupply) document.getElementById('placeOfSupply').value = data.placeOfSupply;
-        if (data.eWayBill) document.getElementById('eWayBill').value = data.eWayBill;
+        setElementValue('customerName', data.customerName);
+        setElementValue('customerAddress', data.customerAddress);
+        setElementValue('customerGSTIN', data.customerGSTIN);
+        setElementValue('customerState', data.customerState);
+        setElementValue('transportMode', data.transportMode);
+        setElementValue('vehicleNumber', data.vehicleNumber);
+        setElementValue('placeOfSupply', data.placeOfSupply);
+        setElementValue('eWayBill', data.eWayBill);
         
         // Populate items
         if (data.items && data.items.length > 0) {
             const tbody = document.getElementById('itemsTableBody');
-            tbody.innerHTML = ''; // Clear existing items
-            
-            data.items.forEach((item, index) => {
-                const row = this.createItemRow(index + 1);
-                row.querySelector('.item-description').value = item.description || '';
-                row.querySelector('.item-hsn').value = item.hsn || '';
-                row.querySelector('.item-quantity').value = item.quantity || '';
-                row.querySelector('.item-rate').value = item.rate || '';
-                row.querySelector('.item-tax').value = item.tax || '';
-                tbody.appendChild(row);
-            });
-            
-            this.itemCounter = data.items.length;
-            this.calculateTotals();
+            if (tbody) {
+                tbody.innerHTML = ''; // Clear existing items
+                
+                data.items.forEach((item, index) => {
+                    const row = this.createItemRow(index + 1);
+                    const descInput = row.querySelector('.item-description');
+                    const hsnSelect = row.querySelector('.item-hsn');
+                    const quantityInput = row.querySelector('.item-quantity');
+                    const rateInput = row.querySelector('.item-rate');
+                    const taxSelect = row.querySelector('.item-tax');
+                    
+                    if (descInput) descInput.value = item.description || '';
+                    if (hsnSelect) hsnSelect.value = item.hsn || '';
+                    if (quantityInput) quantityInput.value = item.quantity || '';
+                    if (rateInput) rateInput.value = item.rate || '';
+                    if (taxSelect) taxSelect.value = item.tax || '';
+                    
+                    tbody.appendChild(row);
+                });
+                
+                this.itemCounter = data.items.length;
+                this.calculateTotals();
+            }
         }
     }
     
     resetForm() {
         if (confirm('Are you sure you want to reset the form? All data will be lost.')) {
+            // Clear localStorage draft
+            localStorage.removeItem('hmcDraftInvoice');
             location.reload();
         }
     }
@@ -423,20 +534,25 @@ class InvoiceGenerator {
         const actionBar = document.querySelector('.action-bar');
         const removeButtons = document.querySelectorAll('.btn-remove');
         
-        actionBar.style.display = 'none';
+        if (actionBar) actionBar.style.display = 'none';
         removeButtons.forEach(btn => btn.style.display = 'none');
         
         window.print();
         
         // Restore buttons after printing
         setTimeout(() => {
-            actionBar.style.display = 'block';
+            if (actionBar) actionBar.style.display = 'block';
             removeButtons.forEach(btn => btn.style.display = 'block');
         }, 1000);
     }
     
     async generatePDF() {
         if (!this.validateForm()) return;
+        
+        if (!window.jspdf || !window.html2canvas) {
+            alert('PDF generation libraries are not loaded. Please refresh the page and try again.');
+            return;
+        }
         
         try {
             const { jsPDF } = window.jspdf;
@@ -446,11 +562,15 @@ class InvoiceGenerator {
             const actionBar = document.querySelector('.action-bar');
             const removeButtons = document.querySelectorAll('.btn-remove');
             
-            actionBar.style.display = 'none';
+            if (actionBar) actionBar.style.display = 'none';
             removeButtons.forEach(btn => btn.style.display = 'none');
             
             // Generate PDF from HTML
             const invoiceElement = document.getElementById('invoiceContainer');
+            
+            if (!invoiceElement) {
+                throw new Error('Invoice container not found');
+            }
             
             const canvas = await html2canvas(invoiceElement, {
                 scale: 2,
@@ -479,11 +599,13 @@ class InvoiceGenerator {
             }
             
             // Save PDF
-            const fileName = `Invoice_${document.getElementById('invoiceNumber').value}.pdf`;
+            const invoiceNumberElement = document.getElementById('invoiceNumber');
+            const invoiceNumber = invoiceNumberElement ? invoiceNumberElement.value : 'Invoice';
+            const fileName = `${invoiceNumber}.pdf`;
             pdf.save(fileName);
             
             // Restore elements
-            actionBar.style.display = 'block';
+            if (actionBar) actionBar.style.display = 'block';
             removeButtons.forEach(btn => btn.style.display = 'block');
             
             this.showSuccessMessage('PDF generated successfully!');
@@ -493,19 +615,24 @@ class InvoiceGenerator {
             console.error('PDF generation error:', error);
             
             // Restore elements on error
-            document.querySelector('.action-bar').style.display = 'block';
-            document.querySelectorAll('.btn-remove').forEach(btn => btn.style.display = 'block');
+            const actionBar = document.querySelector('.action-bar');
+            const removeButtons = document.querySelectorAll('.btn-remove');
+            if (actionBar) actionBar.style.display = 'block';
+            removeButtons.forEach(btn => btn.style.display = 'block');
         }
     }
     
     showSuccessMessage(message) {
         const messageElement = document.getElementById('successMessage');
-        messageElement.querySelector('.alert-text').textContent = message;
-        messageElement.classList.remove('hidden');
-        
-        setTimeout(() => {
-            messageElement.classList.add('hidden');
-        }, 3000);
+        if (messageElement) {
+            const alertText = messageElement.querySelector('.alert-text');
+            if (alertText) alertText.textContent = message;
+            messageElement.classList.remove('hidden');
+            
+            setTimeout(() => {
+                messageElement.classList.add('hidden');
+            }, 3000);
+        }
     }
     
     debounce(func, wait) {
@@ -523,44 +650,45 @@ class InvoiceGenerator {
 
 // Global functions for HTML onclick handlers
 function addNewItem() {
-    invoiceGenerator.addNewItem();
+    if (window.invoiceGenerator) {
+        window.invoiceGenerator.addNewItem();
+    }
 }
 
 function removeItem(rowNumber) {
     const row = document.querySelector(`[data-row="${rowNumber}"]`);
     if (row) {
         row.remove();
-        invoiceGenerator.calculateTotals();
         
-        // Update serial numbers
-        const remainingRows = document.querySelectorAll('.item-row');
-        remainingRows.forEach((row, index) => {
-            row.querySelector('.serial-number').textContent = index + 1;
-            row.setAttribute('data-row', index + 1);
-            
-            // Update remove button onclick
-            const removeBtn = row.querySelector('.btn-remove');
-            removeBtn.setAttribute('onclick', `removeItem(${index + 1})`);
-        });
-        
-        invoiceGenerator.itemCounter = remainingRows.length;
+        if (window.invoiceGenerator) {
+            window.invoiceGenerator.updateRowNumbers();
+            window.invoiceGenerator.calculateTotals();
+        }
     }
 }
 
 function saveInvoice() {
-    invoiceGenerator.saveInvoice();
+    if (window.invoiceGenerator) {
+        window.invoiceGenerator.saveInvoice();
+    }
 }
 
 function printInvoice() {
-    invoiceGenerator.printInvoice();
+    if (window.invoiceGenerator) {
+        window.invoiceGenerator.printInvoice();
+    }
 }
 
 function generatePDF() {
-    invoiceGenerator.generatePDF();
+    if (window.invoiceGenerator) {
+        window.invoiceGenerator.generatePDF();
+    }
 }
 
 function resetForm() {
-    invoiceGenerator.resetForm();
+    if (window.invoiceGenerator) {
+        window.invoiceGenerator.resetForm();
+    }
 }
 
 // Initialize the invoice generator when DOM is loaded
