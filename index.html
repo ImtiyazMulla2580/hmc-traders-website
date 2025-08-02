@@ -3,277 +3,501 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Invoice Generator | H.M.C. Traders</title>
+    <title>H.M.C. TRADERS - AI Business Management Dashboard</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <!-- Action Buttons -->
-        <div class="action-bar">
-            <div class="action-buttons">
-                <button class="btn btn--primary" onclick="generatePDF()">
-                    📄 Download PDF
+    <div class="app-container">
+        <!-- Header Section -->
+        <header class="main-header">
+            <div class="header-content">
+                <div class="company-branding">
+                    <div class="company-logo">🌿</div>
+                    <div class="company-info">
+                        <h1 class="company-name">H.M.C. TRADERS</h1>
+                        <p class="company-tagline">Fresh Ginger & Dry Ginger Merchants</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="ai-indicator">
+                        <div class="ai-pulse"></div>
+                        <span>AI Active</span>
+                    </div>
+                    <div class="user-profile">
+                        <div class="profile-info">
+                            <span class="profile-name">Sadiq</span>
+                            <span class="profile-phone">+9740459661</span>
+                        </div>
+                        <div class="profile-avatar">👤</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="main-navigation">
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tab="dashboard">
+                    <span class="tab-icon">📊</span>
+                    <span class="tab-label">Dashboard</span>
                 </button>
-                <button class="btn btn--secondary" onclick="printInvoice()">
-                    🖨️ Print
+                <button class="nav-tab" data-tab="processing">
+                    <span class="tab-icon">⚙️</span>
+                    <span class="tab-label">Processing</span>
                 </button>
-                <button class="btn btn--outline" onclick="saveInvoice()">
-                    💾 Save
+                <button class="nav-tab" data-tab="inventory">
+                    <span class="tab-icon">📦</span>
+                    <span class="tab-label">Inventory & Trading</span>
                 </button>
-                <button class="btn btn--outline" onclick="resetForm()">
-                    🔄 Reset
+                <button class="nav-tab" data-tab="insights">
+                    <span class="tab-icon">🧠</span>
+                    <span class="tab-label">AI Insights</span>
                 </button>
             </div>
-        </div>
+        </nav>
 
-        <!-- Invoice Container -->
-        <div class="invoice-container" id="invoiceContainer">
-            <!-- Header Section -->
-            <header class="invoice-header">
-                <div class="company-info">
-                    <div class="logo-section">
-                        <div class="logo-placeholder">🏢</div>
-                    </div>
-                    <div class="company-details">
-                        <h1 class="company-name">H.M.C. TRADERS</h1>
-                        <p class="company-tagline">Ginger Merchants</p>
-                        <div class="company-address">
-                            <p>Annavatti to Shivamogga Main Road</p>
-                            <p>CHIKKAIDAGODU-577413 Soraba Tq</p>
-                            <p><strong>GSTIN:</strong> 29CYPPS9466P1ZS</p>
-                            <p><strong>Contact:</strong> 9972987867, 9740459661</p>
-                            <p><strong>Email:</strong> sadiqhmc83@gmail.com</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="invoice-title">
-                    <h2>TAX INVOICE</h2>
-                </div>
-            </header>
-
-            <!-- Invoice Details Grid -->
-            <section class="invoice-details-grid">
-                <div class="invoice-info-card">
-                    <h3>Invoice Details</h3>
-                    <div class="form-group">
-                        <label class="form-label">Invoice Type</label>
-                        <select class="form-control" id="invoiceType">
-                            <option value="CASH">CASH BILL</option>
-                            <option value="CREDIT">CREDIT BILL</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Invoice Number</label>
-                        <input type="text" class="form-control" id="invoiceNumber" value="HMC-1001" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Invoice Date</label>
-                        <input type="date" class="form-control" id="invoiceDate" required>
-                    </div>
-                </div>
-
-                <div class="transport-info-card">
-                    <h3>Transport Details</h3>
-                    <div class="form-group">
-                        <label class="form-label">Transportation Mode</label>
-                        <input type="text" class="form-control" id="transportMode" placeholder="Road/Rail/Air">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Vehicle Number</label>
-                        <input type="text" class="form-control" id="vehicleNumber" placeholder="KA-20-AB-1234">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Date of Supply</label>
-                        <input type="date" class="form-control" id="supplyDate">
-                    </div>
-                </div>
-
-                <div class="supply-info-card">
-                    <h3>Supply Details</h3>
-                    <div class="form-group">
-                        <label class="form-label">State</label>
-                        <input type="text" class="form-control" value="Karnataka : 29" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Place of Supply</label>
-                        <input type="text" class="form-control" id="placeOfSupply" placeholder="City, State">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">E-Way Bill No</label>
-                        <input type="text" class="form-control" id="eWayBill" placeholder="Optional">
-                    </div>
-                </div>
-            </section>
-
-            <!-- Customer Information -->
-            <section class="customer-section">
-                <div class="customer-card">
-                    <h3>Bill To</h3>
-                    <div class="customer-form">
-                        <div class="form-group">
-                            <label class="form-label">Customer Name *</label>
-                            <input type="text" class="form-control" id="customerName" placeholder="Enter customer name" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Customer Address</label>
-                            <textarea class="form-control" id="customerAddress" rows="3" placeholder="Enter customer address"></textarea>
-                        </div>
-                        <div class="customer-form-row">
-                            <div class="form-group">
-                                <label class="form-label">Customer GSTIN</label>
-                                <input type="text" class="form-control" id="customerGSTIN" placeholder="Optional">
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Dashboard Tab -->
+            <section class="tab-content active" id="dashboard">
+                <div class="dashboard-grid">
+                    <!-- KPI Cards -->
+                    <div class="kpi-section">
+                        <div class="kpi-card">
+                            <div class="kpi-icon">💰</div>
+                            <div class="kpi-content">
+                                <h3 class="kpi-value">₹8,50,000</h3>
+                                <p class="kpi-label">Monthly Revenue</p>
+                                <span class="kpi-trend positive">+12% from last month</span>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">Customer State</label>
-                                <select class="form-control" id="customerState">
-                                    <option value="">Select State</option>
-                                    <option value="29">Karnataka</option>
-                                    <option value="27">Maharashtra</option>
-                                    <option value="33">Tamil Nadu</option>
-                                    <option value="32">Kerala</option>
-                                    <option value="36">Telangana</option>
-                                    <option value="37">Andhra Pradesh</option>
-                                    <option value="24">Gujarat</option>
-                                    <option value="08">Rajasthan</option>
-                                    <option value="09">Uttar Pradesh</option>
-                                    <option value="10">Bihar</option>
-                                </select>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon">🏭</div>
+                            <div class="kpi-content">
+                                <h3 class="kpi-value">5,000kg</h3>
+                                <p class="kpi-label">Daily Capacity</p>
+                                <span class="kpi-trend neutral">92% efficiency</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon">👥</div>
+                            <div class="kpi-content">
+                                <h3 class="kpi-value">45</h3>
+                                <p class="kpi-label">Active Customers</p>
+                                <span class="kpi-trend positive">+5 this month</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon">⭐</div>
+                            <div class="kpi-content">
+                                <h3 class="kpi-value">4.8/5.0</h3>
+                                <p class="kpi-label">Quality Rating</p>
+                                <span class="kpi-trend positive">Excellent</span>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
 
-            <!-- Items Table -->
-            <section class="items-section">
-                <div class="items-header">
-                    <h3>Items</h3>
-                    <button class="btn btn--sm btn--primary" onclick="addNewItem()">+ Add Item</button>
-                </div>
-                
-                <div class="table-container">
-                    <table class="items-table">
-                        <thead>
-                            <tr>
-                                <th>S.No</th>
-                                <th>Particulars/Description</th>
-                                <th>HSN Code</th>
-                                <th>Tax %</th>
-                                <th>Qty</th>
-                                <th>Rate (₹)</th>
-                                <th>Amount (₹)</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="itemsTableBody">
-                            <tr class="item-row" data-row="1">
-                                <td class="serial-number">1</td>
-                                <td>
-                                    <input type="text" class="form-control item-description" placeholder="Enter item description">
-                                </td>
-                                <td>
-                                    <select class="form-control item-hsn">
-                                        <option value="">Select HSN</option>
-                                        <option value="0910.11">0910.11 - Ginger (Fresh)</option>
-                                        <option value="0910.12">0910.12 - Ginger (Processed)</option>
-                                        <option value="2008">2008 - Preserved Fruits</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <select class="form-control item-tax">
-                                        <option value="0">0%</option>
-                                        <option value="5">5%</option>
-                                        <option value="12">12%</option>
-                                        <option value="18">18%</option>
-                                        <option value="28">28%</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <input type="number" class="form-control item-quantity" min="0" step="0.01" placeholder="0">
-                                </td>
-                                <td>
-                                    <input type="number" class="form-control item-rate" min="0" step="0.01" placeholder="0.00">
-                                </td>
-                                <td class="item-amount">₹0.00</td>
-                                <td>
-                                    <button class="btn-remove" onclick="removeItem(1)">🗑️</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Calculations -->
-            <section class="calculations-section">
-                <div class="calculations-card">
-                    <div class="calculation-row">
-                        <span class="calc-label">Net Amount:</span>
-                        <span class="calc-value" id="netAmount">₹0.00</span>
-                    </div>
-                    <div class="calculation-row" id="cgstRow" style="display: none;">
-                        <span class="calc-label">CGST @ <span id="cgstPercent">0</span>%:</span>
-                        <span class="calc-value" id="cgstAmount">₹0.00</span>
-                    </div>
-                    <div class="calculation-row" id="sgstRow" style="display: none;">
-                        <span class="calc-label">SGST @ <span id="sgstPercent">0</span>%:</span>
-                        <span class="calc-value" id="sgstAmount">₹0.00</span>
-                    </div>
-                    <div class="calculation-row" id="igstRow" style="display: none;">
-                        <span class="calc-label">IGST @ <span id="igstPercent">0</span>%:</span>
-                        <span class="calc-value" id="igstAmount">₹0.00</span>
-                    </div>
-                    <div class="calculation-row grand-total">
-                        <span class="calc-label">Grand Total:</span>
-                        <span class="calc-value" id="grandTotal">₹0.00</span>
-                    </div>
-                    <div class="amount-words">
-                        <p><strong>Amount in Words:</strong> <span id="amountInWords">Zero Rupees Only</span></p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Terms and Conditions -->
-            <section class="terms-section">
-                <div class="terms-card">
-                    <h3>Terms and Conditions</h3>
-                    <ul class="terms-list">
-                        <li>Good once sold cannot be taken back or exchanged</li>
-                        <li>If bill is not cleared within 30 days, 2% interest will be charged</li>
-                    </ul>
-                </div>
-            </section>
-
-            <!-- Signature Section -->
-            <section class="signature-section">
-                <div class="signature-card">
-                    <div class="signature-left">
-                        <div class="signature-box">
-                            <p class="signature-label">Party Signatory</p>
-                            <div class="signature-line"></div>
+                    <!-- Revenue Chart -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Revenue Trends</h3>
+                            <select id="revenueTimeframe">
+                                <option>Last 6 Months</option>
+                                <option>Last Year</option>
+                            </select>
+                        </div>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="revenueChart"></canvas>
                         </div>
                     </div>
-                    <div class="signature-right">
-                        <div class="company-stamp">
-                            <p class="stamp-label">Company Stamp</p>
+
+                    <!-- Processing Overview -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Processing Overview</h3>
                         </div>
-                        <div class="signature-box">
-                            <p class="signature-label">Authorized Signatory</p>
-                            <div class="signature-line"></div>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="processingChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activities -->
+                    <div class="activity-card">
+                        <h3>Recent Activities</h3>
+                        <div class="activity-list" id="activityList">
+                            <!-- Activities will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- AI Recommendations -->
+                    <div class="ai-card">
+                        <div class="ai-header">
+                            <h3>🤖 AI Recommendations</h3>
+                            <span class="ai-badge">Live</span>
+                        </div>
+                        <div class="recommendation-list" id="recommendationList">
+                            <!-- Recommendations will be populated by JavaScript -->
                         </div>
                     </div>
                 </div>
             </section>
-        </div>
 
-        <!-- Success Message -->
-        <div class="success-message hidden" id="successMessage">
-            <div class="alert-content">
-                <span class="alert-icon">✅</span>
-                <span class="alert-text">Invoice saved successfully!</span>
+            <!-- Processing Tab -->
+            <section class="tab-content" id="processing">
+                <div class="processing-grid">
+                    <!-- Current Batch Info -->
+                    <div class="batch-card">
+                        <h3>Current Batch: GNG-2025-0142</h3>
+                        <div class="batch-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 78%"></div>
+                            </div>
+                            <span class="progress-text">Drying - 78% Complete</span>
+                        </div>
+                        <div class="batch-details">
+                            <div class="batch-metric">
+                                <span class="metric-label">Moisture Content</span>
+                                <span class="metric-value">8.2%</span>
+                            </div>
+                            <div class="batch-metric">
+                                <span class="metric-label">Oil Content</span>
+                                <span class="metric-value">2.4%</span>
+                            </div>
+                            <div class="batch-metric">
+                                <span class="metric-label">Grade A %</span>
+                                <span class="metric-value success">89%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Equipment Status -->
+                    <div class="equipment-card">
+                        <h3>Equipment Status</h3>
+                        <div class="equipment-list">
+                            <div class="equipment-item">
+                                <div class="equipment-info">
+                                    <span class="equipment-name">Washing Line</span>
+                                    <span class="status-badge operational">Operational</span>
+                                </div>
+                            </div>
+                            <div class="equipment-item">
+                                <div class="equipment-info">
+                                    <span class="equipment-name">Drying Chambers</span>
+                                    <span class="status-badge operational">Running</span>
+                                </div>
+                            </div>
+                            <div class="equipment-item">
+                                <div class="equipment-info">
+                                    <span class="equipment-name">Grinding Units</span>
+                                    <span class="status-badge maintenance">Maintenance</span>
+                                </div>
+                            </div>
+                            <div class="equipment-item">
+                                <div class="equipment-info">
+                                    <span class="equipment-name">Packaging Line</span>
+                                    <span class="status-badge operational">Operational</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quality Control Chart -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Quality Metrics Trend</h3>
+                        </div>
+                        <div class="chart-container" style="position: relative; height: 250px;">
+                            <canvas id="qualityChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Production Timeline -->
+                    <div class="timeline-card">
+                        <h3>Production Timeline</h3>
+                        <div class="timeline">
+                            <div class="timeline-item completed">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Raw Material Received</h4>
+                                    <p>2,500kg fresh ginger received and inspected</p>
+                                    <span class="timeline-time">2 days ago</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item completed">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Washing & Sorting</h4>
+                                    <p>Cleaned and sorted by quality grades</p>
+                                    <span class="timeline-time">1 day ago</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item active">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Drying Process</h4>
+                                    <p>Currently in drying chambers - 78% complete</p>
+                                    <span class="timeline-time">In progress</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item pending">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Quality Check</h4>
+                                    <p>Final quality assessment pending</p>
+                                    <span class="timeline-time">Upcoming</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Inventory & Trading Tab -->
+            <section class="tab-content" id="inventory">
+                <div class="inventory-grid">
+                    <!-- Stock Levels -->
+                    <div class="stock-card">
+                        <h3>Current Stock Levels</h3>
+                        <div class="stock-items">
+                            <div class="stock-item">
+                                <div class="stock-info">
+                                    <h4>Fresh Ginger</h4>
+                                    <p class="stock-quantity">15,000 kg</p>
+                                </div>
+                                <div class="stock-indicator high">High</div>
+                            </div>
+                            <div class="stock-item">
+                                <div class="stock-info">
+                                    <h4>Dry Ginger</h4>
+                                    <p class="stock-quantity">3,500 kg</p>
+                                </div>
+                                <div class="stock-indicator medium">Medium</div>
+                            </div>
+                            <div class="stock-item">
+                                <div class="stock-info">
+                                    <h4>Ginger Powder</h4>
+                                    <p class="stock-quantity">850 kg</p>
+                                </div>
+                                <div class="stock-indicator low">Low</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Market Prices -->
+                    <div class="price-card">
+                        <h3>Current Market Prices</h3>
+                        <div class="price-items">
+                            <div class="price-item">
+                                <div class="price-info">
+                                    <h4>Fresh Ginger</h4>
+                                    <p class="current-price">₹85/kg</p>
+                                </div>
+                                <span class="price-trend positive">+8.5%</span>
+                            </div>
+                            <div class="price-item">
+                                <div class="price-info">
+                                    <h4>Dry Ginger</h4>
+                                    <p class="current-price">₹420/kg</p>
+                                </div>
+                                <span class="price-trend positive">+12.3%</span>
+                            </div>
+                        </div>
+                        <div class="market-alert">
+                            <span class="alert-icon">📈</span>
+                            <p>High demand expected - Consider increasing production</p>
+                        </div>
+                    </div>
+
+                    <!-- Top Customers -->
+                    <div class="customers-card">
+                        <h3>Top Customers</h3>
+                        <div class="customer-list" id="customerList">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Pending Orders -->
+                    <div class="orders-card">
+                        <h3>Pending Orders (23)</h3>
+                        <div class="order-summary">
+                            <div class="summary-item">
+                                <span class="summary-label">Total Value</span>
+                                <span class="summary-value">₹4,85,000</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Urgent Orders</span>
+                                <span class="summary-value warning">5</span>
+                            </div>
+                        </div>
+                        <button class="btn btn--primary">View All Orders</button>
+                    </div>
+
+                    <!-- Inventory Distribution Chart -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Inventory Distribution</h3>
+                        </div>
+                        <div class="chart-container" style="position: relative; height: 250px;">
+                            <canvas id="inventoryChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Supplier Network -->
+                    <div class="suppliers-card">
+                        <h3>Supplier Network</h3>
+                        <div class="supplier-list" id="supplierList">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Insights Tab -->
+            <section class="tab-content" id="insights">
+                <div class="insights-grid">
+                    <!-- AI Analytics Dashboard -->
+                    <div class="analytics-card">
+                        <div class="analytics-header">
+                            <h3>🤖 AI Analytics Dashboard</h3>
+                            <span class="last-updated">Last updated: 2 hours ago</span>
+                        </div>
+                        <div class="analytics-metrics">
+                            <div class="metric-item">
+                                <span class="metric-icon">📊</span>
+                                <div class="metric-content">
+                                    <h4>Processing Efficiency</h4>
+                                    <p class="metric-value">+8% improvement</p>
+                                    <p class="metric-description">Compared to last month</p>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-icon">🎯</span>
+                                <div class="metric-content">
+                                    <h4>Demand Prediction</h4>
+                                    <p class="metric-value">High accuracy</p>
+                                    <p class="metric-description">95% prediction accuracy</p>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-icon">💡</span>
+                                <div class="metric-content">
+                                    <h4>Optimization Score</h4>
+                                    <p class="metric-value">87/100</p>
+                                    <p class="metric-description">Excellent performance</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Market Prediction Chart -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Price Prediction (Next 3 Months)</h3>
+                        </div>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="predictionChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- AI Insights List -->
+                    <div class="insights-card">
+                        <h3>🧠 AI-Generated Insights</h3>
+                        <div class="insights-list" id="insightsList">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Export Opportunities -->
+                    <div class="export-card">
+                        <h3>Export Opportunities</h3>
+                        <div class="opportunity-item">
+                            <div class="opportunity-flag">🇦🇪</div>
+                            <div class="opportunity-content">
+                                <h4>UAE Markets</h4>
+                                <p class="profit-margin">23% profit margin potential</p>
+                                <p class="opportunity-details">High demand for organic ginger products</p>
+                            </div>
+                            <button class="btn btn--sm btn--primary">Explore</button>
+                        </div>
+                    </div>
+
+                    <!-- Performance Benchmarks -->
+                    <div class="benchmark-card">
+                        <h3>Performance Benchmarks</h3>
+                        <div class="benchmark-list">
+                            <div class="benchmark-item">
+                                <span class="benchmark-label">Quality Score</span>
+                                <div class="benchmark-bar">
+                                    <div class="benchmark-fill" style="width: 89%"></div>
+                                </div>
+                                <span class="benchmark-value">89%</span>
+                            </div>
+                            <div class="benchmark-item">
+                                <span class="benchmark-label">Delivery Time</span>
+                                <div class="benchmark-bar">
+                                    <div class="benchmark-fill" style="width: 95%"></div>
+                                </div>
+                                <span class="benchmark-value">95%</span>
+                            </div>
+                            <div class="benchmark-item">
+                                <span class="benchmark-label">Customer Satisfaction</span>
+                                <div class="benchmark-bar">
+                                    <div class="benchmark-fill" style="width: 92%"></div>
+                                </div>
+                                <span class="benchmark-value">92%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Automated Reports -->
+                    <div class="reports-card">
+                        <h3>Automated Reports</h3>
+                        <div class="report-list">
+                            <div class="report-item">
+                                <span class="report-icon">📈</span>
+                                <div class="report-content">
+                                    <h4>Weekly Performance Report</h4>
+                                    <p>Generated automatically every Monday</p>
+                                </div>
+                                <button class="btn btn--sm btn--outline">Download</button>
+                            </div>
+                            <div class="report-item">
+                                <span class="report-icon">💰</span>
+                                <div class="report-content">
+                                    <h4>Financial Summary</h4>
+                                    <p>Monthly financial analysis and projections</p>
+                                </div>
+                                <button class="btn btn--sm btn--outline">Download</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- AI Assistant Chat -->
+        <div class="ai-chat-widget" id="aiChatWidget">
+            <div class="chat-toggle" id="chatToggle">
+                <span class="chat-icon">🤖</span>
+            </div>
+            <div class="chat-panel hidden" id="chatPanel">
+                <div class="chat-header">
+                    <h4>AI Assistant</h4>
+                    <button class="chat-close" id="chatClose">×</button>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="chat-message ai">
+                        <div class="message-content">
+                            Hello! I'm your AI assistant. I can help you with business insights, processing optimization, and market analysis. How can I assist you today?
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" placeholder="Ask me anything..." id="chatInput">
+                    <button id="chatSend">Send</button>
+                </div>
             </div>
         </div>
     </div>

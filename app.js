@@ -1,960 +1,956 @@
-// Professional Invoice Generator - Enhanced JavaScript
-class InvoiceGenerator {
+// H.M.C. Traders AI Business Management Dashboard - Fixed Version
+class HMCDashboard {
     constructor() {
-        this.currentInvoiceNumber = this.getNextInvoiceNumber();
-        this.itemCounter = 1;
-        this.companyState = '29'; // Karnataka
-        this.autoSaveTimeout = null;
-        this.stateMapping = {
-            '29': 'Karnataka',
-            '27': 'Maharashtra', 
-            '33': 'Tamil Nadu',
-            '32': 'Kerala',
-            '36': 'Telangana',
-            '37': 'Andhra Pradesh',
-            '24': 'Gujarat',
-            '08': 'Rajasthan',
-            '09': 'Uttar Pradesh',
-            '19': 'West Bengal',
-            '06': 'Haryana',
-            '03': 'Punjab',
-            '07': 'Delhi'
+        this.currentTab = 'dashboard';
+        this.charts = {};
+        this.businessData = {
+            company_info: {
+                name: "H.M.C. TRADERS",
+                tagline: "Fresh Ginger & Dry Ginger Merchants",
+                contacts: {
+                    sadiq: "+9740459661",
+                    munavar: "+9912200610"
+                },
+                email: "sadiqhmc83@gmail.com",
+                address: "Annavatti to Shivamogga Main Road, CHIKKAIDAGODU-577413 Soraba Tq",
+                established: "2018",
+                specialization: "Ginger Processing and Trading"
+            },
+            business_metrics: {
+                daily_processing_capacity: "5000 kg",
+                monthly_revenue: "₹8,50,000",
+                active_customers: 45,
+                supplier_network: 12,
+                processing_efficiency: "92%",
+                quality_rating: "4.8/5.0"
+            },
+            inventory_data: {
+                fresh_ginger_stock: "15,000 kg",
+                dry_ginger_stock: "3,500 kg",
+                ginger_powder_stock: "850 kg",
+                pending_orders: 23,
+                low_stock_alerts: 2
+            },
+            processing_data: {
+                current_batch: "GNG-2025-0142",
+                processing_stage: "Drying - 78% complete",
+                equipment_status: {
+                    washing_line: "Operational",
+                    drying_chambers: "Running",
+                    grinding_units: "Maintenance",
+                    packaging_line: "Operational"
+                },
+                quality_metrics: {
+                    moisture_content: "8.2%",
+                    oil_content: "2.4%",
+                    grade_a_percentage: "89%"
+                }
+            },
+            market_data: {
+                fresh_ginger_price: "₹85/kg",
+                dry_ginger_price: "₹420/kg",
+                price_trend: "Increasing (+12% this month)",
+                demand_forecast: "High demand expected",
+                export_opportunities: 3
+            },
+            ai_insights: [
+                "Processing efficiency increased by 8% compared to last month",
+                "Recommend increasing dry ginger production by 15% based on market demand",
+                "Optimal harvesting time for supplier contracts: Next 10-15 days",
+                "Quality control showing consistent improvement in Grade A products",
+                "Export opportunity to UAE markets showing 23% profit margin potential"
+            ],
+            recent_activities: [
+                {
+                    time: "2 hours ago",
+                    activity: "Completed batch GNG-2025-0141 - 2,200kg processed",
+                    status: "success"
+                },
+                {
+                    time: "5 hours ago", 
+                    activity: "New order received from Chennai - 500kg dry ginger",
+                    status: "pending"
+                },
+                {
+                    time: "1 day ago",
+                    activity: "Equipment maintenance completed on grinding unit #2",
+                    status: "completed"
+                }
+            ],
+            customers: [
+                {name: "Spice World Ltd", location: "Chennai", orders: 12, value: "₹2,40,000"},
+                {name: "Organic Foods Co", location: "Bangalore", orders: 8, value: "₹1,85,000"},
+                {name: "Export House India", location: "Mumbai", orders: 15, value: "₹3,20,000"}
+            ],
+            suppliers: [
+                {name: "Karnataka Ginger Farmers", location: "Sirsi", quality: "Premium", reliability: "95%"},
+                {name: "Western Ghats Produce", location: "Shimoga", quality: "Standard", reliability: "88%"},
+                {name: "Organic Ginger Coop", location: "Kodagu", quality: "Organic", reliability: "92%"}
+            ]
         };
         
         this.init();
     }
     
     init() {
-        this.setCurrentDate();
-        this.updateInvoiceNumber();
-        this.attachEventListeners(); 
-        this.loadSavedData();
-        this.setupFormValidation();
-    }
-    
-    setCurrentDate() {
-        const today = new Date().toISOString().split('T')[0];
-        const invoiceDateEl = document.getElementById('invoiceDate');
-        const supplyDateEl = document.getElementById('supplyDate');
-        
-        if (invoiceDateEl) invoiceDateEl.value = today;
-        if (supplyDateEl) supplyDateEl.value = today;
-    }
-    
-    getNextInvoiceNumber() {
-        const savedNumber = localStorage.getItem('hmcLastInvoiceNumber');
-        return savedNumber ? parseInt(savedNumber) + 1 : 1001;
-    }
-    
-    updateInvoiceNumber() {
-        const invoiceNumberEl = document.getElementById('invoiceNumber');
-        if (invoiceNumberEl) {
-            invoiceNumberEl.value = `HMC-${this.currentInvoiceNumber}`;
-        }
-    }
-    
-    attachEventListeners() {
-        // Real-time calculation listeners
-        document.addEventListener('input', this.debounce((e) => {
-            if (e.target.matches('.item-quantity, .item-rate, .item-tax')) {
-                this.calculateItemAmount(e.target);
-                this.calculateTotals();
-                this.scheduleAutoSave();
-            }
-            
-            // Auto-save on any input change
-            if (e.target.matches('input, select, textarea')) {
-                this.scheduleAutoSave();
-            }
-        }, 100));
-        
-        // Customer state change listener
-        const customerStateSelect = document.getElementById('customerState');
-        if (customerStateSelect) {
-            customerStateSelect.addEventListener('change', () => {
-                this.updateCustomerStateCode();
-                this.calculateTotals();
-                this.scheduleAutoSave();
+        // Wait for DOM to be fully loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                this.setupApplication();
             });
+        } else {
+            this.setupApplication();
         }
-        
-        // Invoice type change listener
-        const invoiceTypeSelect = document.getElementById('invoiceType');
-        if (invoiceTypeSelect) {
-            invoiceTypeSelect.addEventListener('change', () => {
-                this.updateInvoiceTypeDisplay();
-            });
-        }
-        
-        // Form validation on blur
-        document.addEventListener('blur', (e) => {
-            if (e.target.hasAttribute('required')) {
-                this.validateField(e.target);
-            }
-        }, true);
-        
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey) {
-                switch(e.key) {
-                    case 's':
-                        e.preventDefault();
-                        this.saveInvoice();
-                        break;
-                    case 'p':
-                        e.preventDefault();
-                        this.printInvoice();
-                        break;
-                }
-            }
-        });
     }
     
-    setupFormValidation() {
-        const requiredFields = document.querySelectorAll('[required]');
-        requiredFields.forEach(field => {
-            field.addEventListener('invalid', (e) => {
+    setupApplication() {
+        this.setupEventListeners();
+        this.initializeCharts();
+        this.populateData();
+        this.startRealTimeUpdates();
+        this.initAIChat();
+        
+        console.log('H.M.C. Traders Dashboard initialized successfully');
+    }
+    
+    setupEventListeners() {
+        // Tab navigation with error handling
+        const navTabs = document.querySelectorAll('.nav-tab');
+        console.log('Found nav tabs:', navTabs.length);
+        
+        navTabs.forEach((tab, index) => {
+            tab.addEventListener('click', (e) => {
                 e.preventDefault();
-                this.showValidationError(field);
+                e.stopPropagation();
+                
+                const tabId = e.currentTarget.dataset.tab;
+                console.log('Clicked tab:', tabId);
+                
+                if (tabId) {
+                    this.switchTab(tabId);
+                } else {
+                    console.error('Tab ID not found for tab:', index);
+                }
+            });
+            
+            // Add hover effects
+            tab.addEventListener('mouseenter', () => {
+                if (!tab.classList.contains('active')) {
+                    tab.style.backgroundColor = 'var(--color-bg-2)';
+                }
+            });
+            
+            tab.addEventListener('mouseleave', () => {
+                if (!tab.classList.contains('active')) {
+                    tab.style.backgroundColor = '';
+                }
             });
         });
-    }
-    
-    showValidationError(field) {
-        field.style.borderColor = '#DC2626';
-        field.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
         
-        setTimeout(() => {
-            field.style.borderColor = '';
-            field.style.boxShadow = '';
-        }, 3000);
-    }
-    
-    validateField(field) {
-        const isValid = field.checkValidity();
-        if (!isValid) {
-            this.showValidationError(field);
-        } else {
-            field.style.borderColor = '#10B981';
-            field.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
-            
-            setTimeout(() => {
-                field.style.borderColor = '';
-                field.style.boxShadow = '';
-            }, 1000);
-        }
-        return isValid;
-    }
-    
-    updateInvoiceTypeDisplay() {
-        const invoiceTypeSelect = document.getElementById('invoiceType');
-        const invoiceTypeDisplay = document.getElementById('invoiceTypeDisplay');
+        // AI Chat with detailed error handling
+        this.setupChatListeners();
         
-        if (invoiceTypeSelect && invoiceTypeDisplay) {
-            const selectedOption = invoiceTypeSelect.options[invoiceTypeSelect.selectedIndex];
-            invoiceTypeDisplay.textContent = selectedOption.text;
-        }
+        // Button interactions
+        this.setupButtonListeners();
     }
     
-    updateCustomerStateCode() {
-        const customerStateSelect = document.getElementById('customerState');
-        const customerStateCodeInput = document.getElementById('customerStateCode');
+    setupChatListeners() {
+        const chatToggle = document.getElementById('chatToggle');
+        const chatClose = document.getElementById('chatClose');
+        const chatSend = document.getElementById('chatSend');
+        const chatInput = document.getElementById('chatInput');
         
-        if (customerStateSelect && customerStateCodeInput) {
-            const stateCode = customerStateSelect.value;
-            const stateName = this.stateMapping[stateCode];
-            customerStateCodeInput.value = stateCode ? `${stateName} : ${stateCode}` : '';
-        }
-    }
-    
-    addNewItem() {
-        this.itemCounter++;
-        const tbody = document.getElementById('itemsTableBody');
-        const newRow = this.createItemRow(this.itemCounter);
-        tbody.appendChild(newRow);
+        console.log('Chat elements:', { chatToggle: !!chatToggle, chatClose: !!chatClose, chatSend: !!chatSend, chatInput: !!chatInput });
         
-        // Focus on the new item description
-        const newDescInput = newRow.querySelector('.item-description');
-        if (newDescInput) {
-            newDescInput.focus();
+        if (chatToggle) {
+            chatToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Chat toggle clicked');
+                this.toggleChat();
+            });
         }
         
-        this.updateRowNumbers();
-        this.showToast('success', 'Item Added', 'New item row added successfully');
-    }
-    
-    createItemRow(rowNumber) {
-        const row = document.createElement('tr');
-        row.className = 'item-row';
-        row.setAttribute('data-row', rowNumber);
-        
-        row.innerHTML = `
-            <td class="serial-number">${rowNumber}</td>
-            <td>
-                <input type="text" class="form-control item-description" placeholder="Enter item description" list="productsList">
-            </td>
-            <td>
-                <select class="form-control item-hsn">
-                    <option value="">Select HSN</option>
-                    <option value="0910.11">0910.11 - Ginger (Fresh)</option>
-                    <option value="0910.12">0910.12 - Ginger (Processed)</option>
-                    <option value="2008.99">2008.99 - Preserved Fruits</option>
-                </select>
-            </td>
-            <td>
-                <select class="form-control item-tax">
-                    <option value="0">0%</option>
-                    <option value="5">5%</option>
-                    <option value="12">12%</option>
-                    <option value="18">18%</option>
-                    <option value="28">28%</option>
-                </select>
-            </td>
-            <td>
-                <input type="number" class="form-control item-quantity" min="0" step="0.01" placeholder="0">
-            </td>
-            <td>
-                <input type="number" class="form-control item-rate" min="0" step="0.01" placeholder="0.00">
-            </td>
-            <td class="item-amount">₹0.00</td>
-            <td class="no-print">
-                <button type="button" class="btn-remove" onclick="removeItem(${rowNumber})" title="Remove Item">
-                    <span>🗑️</span>
-                </button>
-            </td>
-        `;
-        
-        return row;
-    }
-    
-    updateRowNumbers() {
-        const rows = document.querySelectorAll('.item-row');
-        rows.forEach((row, index) => {
-            const newRowNumber = index + 1;
-            row.setAttribute('data-row', newRowNumber);
-            const serialCell = row.querySelector('.serial-number');
-            if (serialCell) serialCell.textContent = newRowNumber;
-            
-            const removeBtn = row.querySelector('.btn-remove');
-            if (removeBtn) {
-                removeBtn.setAttribute('onclick', `removeItem(${newRowNumber})`);
-            }
-        });
-        this.itemCounter = rows.length;
-    }
-    
-    calculateItemAmount(changedElement) {
-        const row = changedElement.closest('.item-row');
-        if (!row) return;
-        
-        const quantityInput = row.querySelector('.item-quantity');
-        const rateInput = row.querySelector('.item-rate');
-        const amountCell = row.querySelector('.item-amount');
-        
-        if (!quantityInput || !rateInput || !amountCell) return;
-        
-        const quantity = parseFloat(quantityInput.value) || 0;
-        const rate = parseFloat(rateInput.value) || 0;
-        const amount = quantity * rate;
-        
-        amountCell.textContent = `₹${amount.toFixed(2)}`;
-        
-        // Add visual feedback for calculated amount
-        if (amount > 0) {
-            amountCell.style.color = '#10B981';
-            amountCell.style.fontWeight = '600';
-        } else {
-            amountCell.style.color = '';
-            amountCell.style.fontWeight = '';
+        if (chatClose) {
+            chatClose.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Chat close clicked');
+                this.closeChat();
+            });
         }
-    }
-    
-    calculateTotals() {
-        const items = document.querySelectorAll('.item-row');
-        let netAmount = 0;
-        let totalCGST = 0;
-        let totalSGST = 0;
-        let totalIGST = 0;
-        let totalTaxableValue = 0;
         
-        const customerStateSelect = document.getElementById('customerState');
-        const customerState = customerStateSelect ? customerStateSelect.value : '';
-        const isInterState = customerState && customerState !== this.companyState;
+        if (chatSend) {
+            chatSend.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Chat send clicked');
+                this.sendChatMessage();
+            });
+        }
         
-        // Calculate amounts for each item
-        items.forEach(item => {
-            const quantityInput = item.querySelector('.item-quantity');
-            const rateInput = item.querySelector('.item-rate');
-            const taxSelect = item.querySelector('.item-tax');
-            
-            const quantity = parseFloat(quantityInput?.value) || 0;
-            const rate = parseFloat(rateInput?.value) || 0;
-            const taxRate = parseFloat(taxSelect?.value) || 0;
-            const itemAmount = quantity * rate;
-            
-            netAmount += itemAmount;
-            
-            if (itemAmount > 0 && taxRate > 0) {
-                totalTaxableValue += itemAmount;
-                const taxAmount = (itemAmount * taxRate) / 100;
-                
-                if (isInterState) {
-                    totalIGST += taxAmount;
-                } else {
-                    totalCGST += taxAmount / 2;
-                    totalSGST += taxAmount / 2;
+        if (chatInput) {
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    console.log('Enter pressed in chat');
+                    this.sendChatMessage();
                 }
-            }
-        });
-        
-        // Update display elements
-        this.updateAmountDisplay('netAmount', netAmount);
-        
-        // Show/hide tax rows based on transaction type
-        const cgstRow = document.getElementById('cgstRow');
-        const sgstRow = document.getElementById('sgstRow');
-        const igstRow = document.getElementById('igstRow');
-        
-        if (isInterState && totalIGST > 0) {
-            this.showTaxRow(igstRow, 'igstPercent', 'igstAmount', totalIGST, totalTaxableValue);
-            this.hideTaxRow(cgstRow);
-            this.hideTaxRow(sgstRow);
-        } else if (!isInterState && (totalCGST > 0 || totalSGST > 0)) {
-            this.showTaxRow(cgstRow, 'cgstPercent', 'cgstAmount', totalCGST, totalTaxableValue / 2);
-            this.showTaxRow(sgstRow, 'sgstPercent', 'sgstAmount', totalSGST, totalTaxableValue / 2);
-            this.hideTaxRow(igstRow);
-        } else {
-            this.hideTaxRow(cgstRow);
-            this.hideTaxRow(sgstRow);
-            this.hideTaxRow(igstRow);
-        }
-        
-        const grandTotal = netAmount + totalCGST + totalSGST + totalIGST;
-        this.updateAmountDisplay('grandTotal', grandTotal);
-        
-        // Update amount in words
-        const amountInWordsElement = document.getElementById('amountInWords');
-        if (amountInWordsElement) {
-            amountInWordsElement.textContent = this.numberToWords(grandTotal);
+            });
         }
     }
     
-    updateAmountDisplay(elementId, amount) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            element.textContent = `₹${amount.toFixed(2)}`;
-        }
-    }
-    
-    showTaxRow(row, percentId, amountId, taxAmount, taxableAmount) {
-        if (!row) return;
-        
-        row.style.display = 'flex';
-        
-        const percentElement = document.getElementById(percentId);
-        const amountElement = document.getElementById(amountId);
-        
-        if (percentElement && taxableAmount > 0) {
-            const percentage = (taxAmount / taxableAmount) * 100;
-            percentElement.textContent = percentage.toFixed(1);
-        }
-        
-        if (amountElement) {
-            amountElement.textContent = `₹${taxAmount.toFixed(2)}`;
-        }
-    }
-    
-    hideTaxRow(row) {
-        if (row) {
-            row.style.display = 'none';
-        }
-    }
-    
-    numberToWords(amount) {
-        if (amount === 0) return 'Zero Rupees Only';
-        if (amount < 0) return 'Invalid Amount';
-        
-        const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
-        const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
-        const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-        
-        function convertBelowThousand(num) {
-            let result = '';
-            
-            if (num >= 100) {
-                result += ones[Math.floor(num / 100)] + ' Hundred ';
-                num %= 100;
-            }
-            
-            if (num >= 20) {
-                result += tens[Math.floor(num / 10)] + ' ';
-                num %= 10;
-            } else if (num >= 10) {
-                result += teens[num - 10] + ' ';
-                return result;
-            }
-            
-            if (num > 0) {
-                result += ones[num] + ' ';
-            }
-            
-            return result;
-        }
-        
-        let rupees = Math.floor(amount);
-        let paise = Math.round((amount - rupees) * 100);
-        
-        let result = '';
-        
-        if (rupees >= 10000000) {
-            result += convertBelowThousand(Math.floor(rupees / 10000000)) + 'Crore ';
-            rupees %= 10000000;
-        }
-        
-        if (rupees >= 100000) {
-            result += convertBelowThousand(Math.floor(rupees / 100000)) + 'Lakh ';
-            rupees %= 100000;
-        }
-        
-        if (rupees >= 1000) {
-            result += convertBelowThousand(Math.floor(rupees / 1000)) + 'Thousand ';
-            rupees %= 1000;
-        }
-        
-        if (rupees > 0) {
-            result += convertBelowThousand(rupees);
-        }
-        
-        result += 'Rupees';
-        
-        if (paise > 0) {
-            result += ' and ' + convertBelowThousand(paise) + 'Paise';
-        }
-        
-        return result.trim() + ' Only';
-    }
-    
-    validateForm() {
-        const errors = [];
-        
-        // Required field validation
-        const customerName = document.getElementById('customerName');
-        if (!customerName || !customerName.value.trim()) {
-            errors.push('Customer Name is required');
-            if (customerName) this.showValidationError(customerName);
-        }
-        
-        const invoiceDate = document.getElementById('invoiceDate');
-        if (!invoiceDate || !invoiceDate.value) {
-            errors.push('Invoice Date is required');
-            if (invoiceDate) this.showValidationError(invoiceDate);
-        }
-        
-        // Validate at least one valid item
-        const items = document.querySelectorAll('.item-row');
-        let validItems = 0;
-        
-        items.forEach(item => {
-            const quantityInput = item.querySelector('.item-quantity');
-            const rateInput = item.querySelector('.item-rate');
-            const descInput = item.querySelector('.item-description');
-            
-            const quantity = parseFloat(quantityInput?.value) || 0;
-            const rate = parseFloat(rateInput?.value) || 0;
-            const description = descInput?.value?.trim() || '';
-            
-            if (quantity > 0 && rate > 0 && description) {
-                validItems++;
-            }
-        });
-        
-        if (validItems === 0) {
-            errors.push('At least one item with description, quantity, and rate is required');
-        }
-        
-        if (errors.length > 0) {
-            this.showToast('error', 'Validation Error', errors.join(', '));
-            return false;
-        }
-        
-        return true;
-    }
-    
-    collectInvoiceData() {
-        const items = [];
-        const itemRows = document.querySelectorAll('.item-row');
-        
-        itemRows.forEach(row => {
-            const descInput = row.querySelector('.item-description');
-            const hsnSelect = row.querySelector('.item-hsn');
-            const quantityInput = row.querySelector('.item-quantity');
-            const rateInput = row.querySelector('.item-rate');
-            const taxSelect = row.querySelector('.item-tax');
-            
-            const description = descInput?.value?.trim() || '';
-            const hsn = hsnSelect?.value || '';
-            const quantity = parseFloat(quantityInput?.value) || 0;
-            const rate = parseFloat(rateInput?.value) || 0;
-            const tax = parseFloat(taxSelect?.value) || 0;
-            const amount = quantity * rate;
-            
-            if (description || quantity > 0 || rate > 0) {
-                items.push({ description, hsn, quantity, rate, tax, amount });
-            }
-        });
-        
-        const getElementValue = (id) => {
-            const element = document.getElementById(id);
-            return element ? element.value : '';
-        };
-        
-        const getElementText = (id) => {
-            const element = document.getElementById(id);
-            return element ? element.textContent.replace('₹', '') : '';
-        };
-        
-        return {
-            invoiceNumber: getElementValue('invoiceNumber'),
-            invoiceType: getElementValue('invoiceType'),
-            invoiceDate: getElementValue('invoiceDate'),
-            supplyDate: getElementValue('supplyDate'),
-            transportMode: getElementValue('transportMode'),
-            vehicleNumber: getElementValue('vehicleNumber'),
-            placeOfSupply: getElementValue('placeOfSupply'),
-            eWayBill: getElementValue('eWayBill'),
-            customerName: getElementValue('customerName'),
-            customerAddress: getElementValue('customerAddress'),
-            customerGSTIN: getElementValue('customerGSTIN'),
-            customerState: getElementValue('customerState'),
-            items: items,
-            calculations: {
-                netAmount: getElementText('netAmount'),
-                cgstAmount: getElementText('cgstAmount'),
-                sgstAmount: getElementText('sgstAmount'),
-                igstAmount: getElementText('igstAmount'),
-                grandTotal: getElementText('grandTotal'),
-                amountInWords: document.getElementById('amountInWords')?.textContent || ''
-            },
-            timestamp: new Date().toISOString()
-        };
-    }
-    
-    saveInvoice() {
-        if (!this.validateForm()) return;
-        
-        const invoiceData = this.collectInvoiceData();
-        const invoiceKey = `invoice_${invoiceData.invoiceNumber}`;
-        
-        try {
-            // Save individual invoice
-            localStorage.setItem(invoiceKey, JSON.stringify(invoiceData));
-            
-            // Update invoice counter
-            localStorage.setItem('hmcLastInvoiceNumber', this.currentInvoiceNumber.toString());
-            
-            // Clear draft
-            localStorage.removeItem('hmcDraftInvoice');
-            
-            this.showToast('success', 'Invoice Saved', `Invoice ${invoiceData.invoiceNumber} saved successfully!`);
-            
-            // Increment invoice number for next invoice
-            this.currentInvoiceNumber++;
-            this.updateInvoiceNumber();
-            
-        } catch (error) {
-            this.showToast('error', 'Save Error', 'Failed to save invoice. Please try again.');
-            console.error('Save error:', error);
-        }
-    }
-    
-    scheduleAutoSave() {
-        // Clear existing timeout
-        if (this.autoSaveTimeout) {
-            clearTimeout(this.autoSaveTimeout);
-        }
-        
-        // Schedule new auto-save
-        this.autoSaveTimeout = setTimeout(() => {
-            this.autoSave();
-        }, 2000);
-    }
-    
-    autoSave() {
-        const customerName = document.getElementById('customerName');
-        if (!customerName || !customerName.value.trim()) return;
-        
-        const invoiceData = this.collectInvoiceData();
-        
-        try {
-            localStorage.setItem('hmcDraftInvoice', JSON.stringify(invoiceData));
-            this.showAutoSaveIndicator();
-        } catch (error) {
-            console.error('Auto-save error:', error);
-        }
-    }
-    
-    showAutoSaveIndicator() {
-        const indicator = document.getElementById('autoSaveIndicator');
-        if (indicator) {
-            indicator.classList.add('show');
-            setTimeout(() => {
-                indicator.classList.remove('show');
-            }, 2000);
-        }
-    }
-    
-    loadSavedData() {
-        try {
-            const draftData = localStorage.getItem('hmcDraftInvoice');
-            if (draftData) {
-                const data = JSON.parse(draftData);
-                this.populateForm(data);
-                this.showToast('success', 'Draft Loaded', 'Previous draft has been restored');
-            }
-        } catch (error) {
-            console.error('Error loading draft:', error);
-        }
-    }
-    
-    populateForm(data) {
-        const setElementValue = (id, value) => {
-            const element = document.getElementById(id);
-            if (element && value !== undefined && value !== null) {
-                element.value = value;
-            }
-        };
-        
-        // Populate form fields (excluding auto-generated fields)
-        setElementValue('customerName', data.customerName);
-        setElementValue('customerAddress', data.customerAddress);
-        setElementValue('customerGSTIN', data.customerGSTIN);
-        setElementValue('customerState', data.customerState);
-        setElementValue('transportMode', data.transportMode);
-        setElementValue('vehicleNumber', data.vehicleNumber);
-        setElementValue('placeOfSupply', data.placeOfSupply);
-        setElementValue('eWayBill', data.eWayBill);
-        
-        // Update customer state code
-        this.updateCustomerStateCode();
-        
-        // Populate items
-        if (data.items && data.items.length > 0) {
-            const tbody = document.getElementById('itemsTableBody');
-            if (tbody) {
-                tbody.innerHTML = ''; // Clear existing items
-                
-                data.items.forEach((item, index) => {
-                    const row = this.createItemRow(index + 1);
+    setupButtonListeners() {
+        // Add click handlers for all buttons
+        document.querySelectorAll('.btn').forEach(button => {
+            if (!button.hasAttribute('data-listener-added')) {
+                button.addEventListener('click', (e) => {
+                    const buttonText = button.textContent.trim();
+                    console.log('Button clicked:', buttonText);
                     
-                    const descInput = row.querySelector('.item-description');
-                    const hsnSelect = row.querySelector('.item-hsn');
-                    const quantityInput = row.querySelector('.item-quantity');
-                    const rateInput = row.querySelector('.item-rate');
-                    const taxSelect = row.querySelector('.item-tax');
+                    // Provide visual feedback
+                    button.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        button.style.transform = '';
+                    }, 150);
                     
-                    if (descInput) descInput.value = item.description || '';
-                    if (hsnSelect) hsnSelect.value = item.hsn || '';
-                    if (quantityInput) quantityInput.value = item.quantity || '';
-                    if (rateInput) rateInput.value = item.rate || '';
-                    if (taxSelect) taxSelect.value = item.tax || '';
-                    
-                    tbody.appendChild(row);
+                    // Handle specific buttons
+                    if (buttonText.includes('View All Orders')) {
+                        this.showNotification('Orders panel would open here', 'info');
+                    } else if (buttonText.includes('Explore')) {
+                        this.showNotification('Export opportunity details would open here', 'info');
+                    } else if (buttonText.includes('Download')) {
+                        this.showNotification('Report download started', 'success');
+                    }
                 });
                 
-                this.itemCounter = data.items.length;
-                
-                // Recalculate amounts
-                setTimeout(() => {
-                    document.querySelectorAll('.item-row').forEach(row => {
-                        const quantityInput = row.querySelector('.item-quantity');
-                        if (quantityInput) {
-                            this.calculateItemAmount(quantityInput);
-                        }
-                    });
-                    this.calculateTotals();
-                }, 100);
+                button.setAttribute('data-listener-added', 'true');
             }
+        });
+    }
+    
+    switchTab(tabId) {
+        console.log('Switching to tab:', tabId);
+        
+        try {
+            // Update active tab with error checking
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => {
+                tab.classList.remove('active');
+                tab.style.backgroundColor = '';
+            });
+            
+            const activeTab = document.querySelector(`[data-tab="${tabId}"]`);
+            if (activeTab) {
+                activeTab.classList.add('active');
+                console.log('Activated tab:', tabId);
+            } else {
+                console.error('Tab not found:', tabId);
+                return;
+            }
+            
+            // Update content with error checking
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                content.style.display = 'none';
+            });
+            
+            const activeContent = document.getElementById(tabId);
+            if (activeContent) {
+                activeContent.classList.add('active');
+                activeContent.style.display = 'block';
+                console.log('Activated content for:', tabId);
+            } else {
+                console.error('Tab content not found:', tabId);
+                return;
+            }
+            
+            this.currentTab = tabId;
+            
+            // Refresh charts after tab switch
+            setTimeout(() => {
+                this.refreshChartsForTab(tabId);
+            }, 100);
+            
+            // Show notification
+            this.showNotification(`Switched to ${tabId.charAt(0).toUpperCase() + tabId.slice(1)} tab`, 'success');
+            
+        } catch (error) {
+            console.error('Error switching tabs:', error);
+            this.showNotification('Error switching tabs', 'error');
         }
     }
     
-    resetForm() {
-        if (!confirm('Are you sure you want to reset the form? All unsaved data will be lost.')) {
-            return;
-        }
-        
+    refreshChartsForTab(tabId) {
         try {
-            // Clear localStorage
-            localStorage.removeItem('hmcDraftInvoice');
-            
-            // Reset form
-            const form = document.querySelector('.invoice-container');
-            const inputs = form.querySelectorAll('input:not([readonly]), select, textarea');
-            inputs.forEach(input => {
-                if (input.type === 'date') {
-                    input.value = new Date().toISOString().split('T')[0];
-                } else if (input.tagName === 'SELECT') {
-                    input.selectedIndex = 0;
-                } else {
-                    input.value = '';
+            Object.values(this.charts).forEach(chart => {
+                if (chart && typeof chart.resize === 'function') {
+                    chart.resize();
                 }
             });
             
-            // Reset items table to single row
-            const tbody = document.getElementById('itemsTableBody');
-            if (tbody) {
-                tbody.innerHTML = '';
-                const newRow = this.createItemRow(1);
-                tbody.appendChild(newRow);
-                this.itemCounter = 1;
+            // Initialize tab-specific charts if needed
+            if (tabId === 'processing' && !this.charts.quality) {
+                this.createQualityChart();
+            } else if (tabId === 'inventory' && !this.charts.inventory) {
+                this.createInventoryChart();
+            } else if (tabId === 'insights' && !this.charts.prediction) {
+                this.createPredictionChart();
             }
-            
-            // Reset calculations
-            this.calculateTotals();
-            
-            // Reset invoice number
-            this.currentInvoiceNumber = this.getNextInvoiceNumber();
-            this.updateInvoiceNumber();
-            
-            this.showToast('success', 'Form Reset', 'Form has been reset successfully');
-            
         } catch (error) {
-            this.showToast('error', 'Reset Error', 'Failed to reset form');
-            console.error('Reset error:', error);
+            console.error('Error refreshing charts:', error);
         }
     }
     
-    async printInvoice() {
-        if (!this.validateForm()) return;
-        
+    initializeCharts() {
         try {
-            this.showLoadingOverlay('Preparing for print...');
+            // Revenue Chart
+            this.createRevenueChart();
             
-            // Hide non-printable elements
-            const nonPrintElements = document.querySelectorAll('.no-print, .action-bar');
-            nonPrintElements.forEach(el => el.style.display = 'none');
+            // Processing Chart  
+            this.createProcessingChart();
             
-            // Trigger print
-            setTimeout(() => {
-                window.print();
-                
-                // Restore elements after print dialog
-                setTimeout(() => {
-                    nonPrintElements.forEach(el => el.style.display = '');
-                    this.hideLoadingOverlay();
-                    this.showToast('success', 'Print Ready', 'Print dialog opened successfully');
-                }, 1000);
-            }, 500);
-            
+            console.log('Initial charts created successfully');
         } catch (error) {
-            this.hideLoadingOverlay();
-            this.showToast('error', 'Print Error', 'Failed to open print dialog');
-            console.error('Print error:', error);
+            console.error('Error initializing charts:', error);
         }
     }
     
-    async generatePDF() {
-        if (!this.validateForm()) return;
-        
-        if (!window.jspdf || !window.html2canvas) {
-            this.showToast('error', 'Library Error', 'PDF generation libraries not loaded');
+    createRevenueChart() {
+        const ctx = document.getElementById('revenueChart');
+        if (!ctx) {
+            console.warn('Revenue chart canvas not found');
             return;
         }
         
         try {
-            this.showLoadingOverlay('Generating PDF...');
+            const chartColors = ['#1FB8CD', '#FFC185', '#B4413C', '#ECEBD5', '#5D878F'];
             
-            const { jsPDF } = window.jspdf;
-            
-            // Hide non-printable elements
-            const nonPrintElements = document.querySelectorAll('.no-print, .action-bar');
-            nonPrintElements.forEach(el => el.style.display = 'none');
-            
-            // Get invoice element
-            const invoiceElement = document.getElementById('invoiceContainer');
-            if (!invoiceElement) {
-                throw new Error('Invoice container not found');
-            }
-            
-            // Generate canvas from HTML
-            const canvas = await html2canvas(invoiceElement, {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                backgroundColor: '#ffffff',
-                width: invoiceElement.offsetWidth,
-                height: invoiceElement.offsetHeight,
-                onclone: (clonedDoc) => {
-                    // Ensure colors are preserved in clone
-                    const clonedElement = clonedDoc.getElementById('invoiceContainer');
-                    if (clonedElement) {
-                        clonedElement.style.backgroundColor = '#ffffff';
+            this.charts.revenue = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Revenue (₹)',
+                        data: [650000, 720000, 680000, 780000, 820000, 850000],
+                        borderColor: chartColors[0],
+                        backgroundColor: chartColors[0] + '20',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + (value / 100000).toFixed(1) + 'L';
+                                }
+                            }
+                        }
                     }
                 }
             });
             
-            // Create PDF
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgData = canvas.toDataURL('image/png', 1.0);
+            console.log('Revenue chart created successfully');
+        } catch (error) {
+            console.error('Error creating revenue chart:', error);
+        }
+    }
+    
+    createProcessingChart() {
+        const ctx = document.getElementById('processingChart');
+        if (!ctx) {
+            console.warn('Processing chart canvas not found');
+            return;
+        }
+        
+        try {
+            const chartColors = ['#1FB8CD', '#FFC185', '#B4413C', '#ECEBD5'];
             
-            // Calculate dimensions
-            const imgWidth = 210; // A4 width in mm
-            const pageHeight = 295; // A4 height in mm
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            let heightLeft = imgHeight;
-            let position = 0;
+            this.charts.processing = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Fresh Ginger', 'Dry Ginger', 'Ginger Powder', 'Processing'],
+                    datasets: [{
+                        data: [45, 30, 15, 10],
+                        backgroundColor: chartColors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
             
-            // Add first page
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, '', 'FAST');
-            heightLeft -= pageHeight;
+            console.log('Processing chart created successfully');
+        } catch (error) {
+            console.error('Error creating processing chart:', error);
+        }
+    }
+    
+    createQualityChart() {
+        const ctx = document.getElementById('qualityChart');
+        if (!ctx) {
+            console.warn('Quality chart canvas not found');
+            return;
+        }
+        
+        try {
+            const chartColors = ['#1FB8CD', '#FFC185', '#B4413C'];
             
-            // Add additional pages if needed
-            while (heightLeft >= 0) {
-                position = heightLeft - imgHeight;
-                pdf.addPage();
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, '', 'FAST');
-                heightLeft -= pageHeight;
+            this.charts.quality = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Grade A', 'Grade B', 'Grade C'],
+                    datasets: [{
+                        label: 'Quality Distribution (%)',
+                        data: [89, 8, 3],
+                        backgroundColor: chartColors,
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            console.log('Quality chart created successfully');
+        } catch (error) {
+            console.error('Error creating quality chart:', error);
+        }
+    }
+    
+    createInventoryChart() {
+        const ctx = document.getElementById('inventoryChart');
+        if (!ctx) {
+            console.warn('Inventory chart canvas not found');
+            return;
+        }
+        
+        try {
+            const chartColors = ['#1FB8CD', '#FFC185', '#B4413C'];
+            
+            this.charts.inventory = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Fresh Ginger', 'Dry Ginger', 'Ginger Powder'],
+                    datasets: [{
+                        data: [15000, 3500, 850],
+                        backgroundColor: chartColors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed + ' kg';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            console.log('Inventory chart created successfully');
+        } catch (error) {
+            console.error('Error creating inventory chart:', error);
+        }
+    }
+    
+    createPredictionChart() {
+        const ctx = document.getElementById('predictionChart');
+        if (!ctx) {
+            console.warn('Prediction chart canvas not found');
+            return;
+        }
+        
+        try {
+            const chartColors = ['#1FB8CD', '#FFC185'];
+            
+            this.charts.prediction = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Current', 'Month 1', 'Month 2', 'Month 3'],
+                    datasets: [
+                        {
+                            label: 'Fresh Ginger Price',
+                            data: [85, 88, 92, 95],
+                            borderColor: chartColors[0],
+                            backgroundColor: chartColors[0] + '20',
+                            fill: false,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Dry Ginger Price',
+                            data: [420, 435, 450, 465],
+                            borderColor: chartColors[1],
+                            backgroundColor: chartColors[1] + '20',
+                            fill: false,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            console.log('Prediction chart created successfully');
+        } catch (error) {
+            console.error('Error creating prediction chart:', error);
+        }
+    }
+    
+    populateData() {
+        try {
+            this.populateActivities();
+            this.populateRecommendations();
+            this.populateCustomers();
+            this.populateSuppliers();
+            this.populateInsights();
+            console.log('Data populated successfully');
+        } catch (error) {
+            console.error('Error populating data:', error);
+        }
+    }
+    
+    populateActivities() {
+        const activityList = document.getElementById('activityList');
+        if (!activityList) return;
+        
+        activityList.innerHTML = '';
+        
+        this.businessData.recent_activities.forEach(activity => {
+            const activityElement = document.createElement('div');
+            activityElement.className = 'activity-item';
+            
+            activityElement.innerHTML = `
+                <div class="activity-status ${activity.status}"></div>
+                <div class="activity-content">
+                    <h4 class="activity-title">${activity.activity}</h4>
+                    <span class="activity-time">${activity.time}</span>
+                </div>
+            `;
+            
+            activityList.appendChild(activityElement);
+        });
+    }
+    
+    populateRecommendations() {
+        const recommendationList = document.getElementById('recommendationList');
+        if (!recommendationList) return;
+        
+        recommendationList.innerHTML = '';
+        
+        this.businessData.ai_insights.slice(0, 3).forEach(insight => {
+            const recommendationElement = document.createElement('div');
+            recommendationElement.className = 'recommendation-item';
+            
+            recommendationElement.innerHTML = `<p>${insight}</p>`;
+            
+            recommendationList.appendChild(recommendationElement);
+        });
+    }
+    
+    populateCustomers() {
+        const customerList = document.getElementById('customerList');
+        if (!customerList) return;
+        
+        customerList.innerHTML = '';
+        
+        this.businessData.customers.forEach(customer => {
+            const customerElement = document.createElement('div');
+            customerElement.className = 'customer-item';
+            
+            customerElement.innerHTML = `
+                <div class="customer-info">
+                    <h4 class="customer-name">${customer.name}</h4>
+                    <p class="customer-location">${customer.location}</p>
+                </div>
+                <div class="customer-value">${customer.value}</div>
+            `;
+            
+            customerList.appendChild(customerElement);
+        });
+    }
+    
+    populateSuppliers() {
+        const supplierList = document.getElementById('supplierList');
+        if (!supplierList) return;
+        
+        supplierList.innerHTML = '';
+        
+        this.businessData.suppliers.forEach(supplier => {
+            const supplierElement = document.createElement('div');
+            supplierElement.className = 'supplier-item';
+            
+            supplierElement.innerHTML = `
+                <div class="supplier-info">
+                    <h4 class="supplier-name">${supplier.name}</h4>
+                    <p class="supplier-location">${supplier.location} - ${supplier.quality}</p>
+                </div>
+                <div class="supplier-reliability">${supplier.reliability}</div>
+            `;
+            
+            supplierList.appendChild(supplierElement);
+        });
+    }
+    
+    populateInsights() {
+        const insightsList = document.getElementById('insightsList');
+        if (!insightsList) return;
+        
+        insightsList.innerHTML = '';
+        
+        this.businessData.ai_insights.forEach(insight => {
+            const insightElement = document.createElement('div');
+            insightElement.className = 'insight-item';
+            
+            insightElement.innerHTML = `<p>${insight}</p>`;
+            
+            insightsList.appendChild(insightElement);
+        });
+    }
+    
+    startRealTimeUpdates() {
+        // Simulate real-time updates every 30 seconds
+        setInterval(() => {
+            this.updateRandomMetrics();
+        }, 30000);
+        
+        // Animate progress bars and counters on load
+        setTimeout(() => {
+            this.animateProgressBars();
+            this.animateCounters();
+        }, 1000);
+    }
+    
+    updateRandomMetrics() {
+        try {
+            // Simulate small changes in metrics for real-time feel
+            const batch78 = document.querySelector('.progress-fill');
+            if (batch78) {
+                const currentWidth = parseInt(batch78.style.width) || 78;
+                const newWidth = Math.min(100, currentWidth + Math.random() * 2);
+                batch78.style.width = newWidth + '%';
+                
+                const progressText = batch78.parentNode.nextElementSibling;
+                if (progressText) {
+                    progressText.textContent = `Drying - ${Math.round(newWidth)}% Complete`;
+                }
             }
             
-            // Save PDF
-            const invoiceNumber = document.getElementById('invoiceNumber')?.value || 'Invoice';
-            const fileName = `${invoiceNumber}_${new Date().toISOString().split('T')[0]}.pdf`;
-            pdf.save(fileName);
-            
-            // Restore elements
-            nonPrintElements.forEach(el => el.style.display = '');
-            
-            this.hideLoadingOverlay();
-            this.showToast('success', 'PDF Generated', `PDF saved as ${fileName}`);
-            
+            // Update AI indicator pulse
+            this.pulseAIIndicator();
         } catch (error) {
-            // Restore elements on error
-            const nonPrintElements = document.querySelectorAll('.no-print, .action-bar');
-            nonPrintElements.forEach(el => el.style.display = '');
+            console.error('Error updating metrics:', error);
+        }
+    }
+    
+    animateProgressBars() {
+        document.querySelectorAll('.progress-fill, .benchmark-fill').forEach(bar => {
+            const targetWidth = bar.style.width;
+            bar.style.width = '0%';
             
-            this.hideLoadingOverlay();
-            this.showToast('error', 'PDF Error', 'Failed to generate PDF. Please try again.');
-            console.error('PDF generation error:', error);
+            setTimeout(() => {
+                bar.style.transition = 'width 2s ease-out';
+                bar.style.width = targetWidth;
+            }, 500);
+        });
+    }
+    
+    animateCounters() {
+        document.querySelectorAll('.kpi-value').forEach(counter => {
+            const target = counter.textContent;
+            const numericValue = parseInt(target.replace(/[^\d]/g, ''));
+            
+            if (numericValue) {
+                let current = 0;
+                const increment = numericValue / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= numericValue) {
+                        counter.textContent = target;
+                        clearInterval(timer);
+                    } else {
+                        counter.textContent = target.replace(numericValue.toString(), Math.round(current).toString());
+                    }
+                }, 50);
+            }
+        });
+    }
+    
+    pulseAIIndicator() {
+        const aiPulse = document.querySelector('.ai-pulse');
+        if (aiPulse) {
+            aiPulse.style.animation = 'none';
+            setTimeout(() => {
+                aiPulse.style.animation = 'pulse 2s infinite';
+            }, 10);
         }
     }
     
-    showLoadingOverlay(message = 'Loading...') {
-        const overlay = document.getElementById('loadingOverlay');
-        const loadingText = overlay?.querySelector('.loading-text');
+    initAIChat() {
+        this.chatMessages = [
+            {
+                type: 'ai',
+                message: "Hello! I'm your AI assistant. I can help you with business insights, processing optimization, and market analysis. How can I assist you today?"
+            }
+        ];
         
-        if (overlay) {
-            if (loadingText) loadingText.textContent = message;
-            overlay.classList.remove('hidden');
+        this.aiResponses = [
+            "Based on current market trends, I recommend increasing dry ginger production by 15%.",
+            "Your processing efficiency has improved by 8% this month. Great job!",
+            "The UAE export opportunity shows excellent potential with 23% profit margins.",
+            "Quality metrics are consistently improving. Grade A production is at 89%.",
+            "Current inventory levels suggest restocking fresh ginger within 2 weeks.",
+            "Weather patterns indicate optimal harvesting conditions in the next 10-15 days.",
+            "Customer satisfaction is at 4.8/5.0 - excellent performance!",
+            "Equipment maintenance schedule suggests checking grinding unit #3 soon.",
+            "Market prices are trending upward - good time for sales!",
+            "Your supplier network reliability average is 91.6% - very stable."
+        ];
+    }
+    
+    toggleChat() {
+        const chatPanel = document.getElementById('chatPanel');
+        if (chatPanel) {
+            const isHidden = chatPanel.classList.contains('hidden');
+            if (isHidden) {
+                chatPanel.classList.remove('hidden');
+                this.showNotification('AI Assistant activated', 'info');
+            } else {
+                chatPanel.classList.add('hidden');
+            }
+            console.log('Chat toggled, hidden:', !isHidden);
         }
     }
     
-    hideLoadingOverlay() {
-        const overlay = document.getElementById('loadingOverlay');
-        if (overlay) {
-            overlay.classList.add('hidden');
+    closeChat() {
+        const chatPanel = document.getElementById('chatPanel');
+        if (chatPanel) {
+            chatPanel.classList.add('hidden');
+            console.log('Chat closed');
         }
     }
     
-    showToast(type, title, message) {
-        const container = document.getElementById('toastContainer');
-        if (!container) return;
+    sendChatMessage() {
+        const chatInput = document.getElementById('chatInput');
+        const chatMessages = document.getElementById('chatMessages');
         
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
+        if (!chatInput || !chatMessages) return;
         
-        const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+        const message = chatInput.value.trim();
+        if (!message) return;
         
-        toast.innerHTML = `
-            <div class="toast-icon">${icon}</div>
-            <div class="toast-content">
-                <div class="toast-title">${title}</div>
-                <p class="toast-message">${message}</p>
+        // Add user message
+        this.addChatMessage('user', message);
+        chatInput.value = '';
+        
+        // Simulate AI thinking
+        setTimeout(() => {
+            const aiResponse = this.generateAIResponse(message);
+            this.addChatMessage('ai', aiResponse);
+        }, 1000);
+    }
+    
+    addChatMessage(type, message) {
+        const chatMessages = document.getElementById('chatMessages');
+        if (!chatMessages) return;
+        
+        const messageElement = document.createElement('div');
+        messageElement.className = `chat-message ${type}`;
+        
+        messageElement.innerHTML = `
+            <div class="message-content">${message}</div>
+        `;
+        
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    generateAIResponse(userMessage) {
+        const message = userMessage.toLowerCase();
+        
+        // Simple keyword-based responses
+        if (message.includes('revenue') || message.includes('sales')) {
+            return "Current monthly revenue is ₹8,50,000, up 12% from last month. The ginger market is showing strong growth trends.";
+        } else if (message.includes('inventory') || message.includes('stock')) {
+            return "Current inventory: Fresh Ginger - 15,000kg, Dry Ginger - 3,500kg, Ginger Powder - 850kg. Recommendation: Restock fresh ginger soon.";
+        } else if (message.includes('quality') || message.includes('grade')) {
+            return "Quality metrics are excellent! Grade A production at 89%, moisture content at 8.2%, oil content at 2.4%. Quality rating: 4.8/5.0.";
+        } else if (message.includes('processing') || message.includes('production')) {
+            return "Current processing efficiency: 92%. Batch GNG-2025-0142 is 78% complete in drying stage. All equipment operational except grinding unit in maintenance.";
+        } else if (message.includes('export') || message.includes('international')) {
+            return "Great export opportunity to UAE markets with 23% profit margin potential. High demand for organic ginger products globally.";
+        } else if (message.includes('price') || message.includes('market')) {
+            return "Current prices: Fresh Ginger ₹85/kg (+8.5%), Dry Ginger ₹420/kg (+12.3%). Market trend: Increasing demand expected.";
+        } else {
+            // Random AI response
+            return this.aiResponses[Math.floor(Math.random() * this.aiResponses.length)];
+        }
+    }
+    
+    // Add notification system
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <span class="notification-icon">${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'error' ? '❌' : 'ℹ️'}</span>
+                <span class="notification-message">${message}</span>
             </div>
         `;
         
-        container.appendChild(toast);
+        document.body.appendChild(notification);
         
         // Auto-remove after 5 seconds
         setTimeout(() => {
-            if (toast.parentNode) {
-                toast.style.transform = 'translateX(100%)';
-                toast.style.opacity = '0';
+            if (notification.parentNode) {
+                notification.style.opacity = '0';
                 setTimeout(() => {
-                    if (toast.parentNode) {
-                        container.removeChild(toast);
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
                     }
                 }, 300);
             }
         }, 5000);
     }
+}
+
+// Initialize dashboard when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing dashboard...');
     
-    debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-}
+    window.hmcDashboard = new HMCDashboard();
+    
+    // Add some welcome notifications
+    setTimeout(() => {
+        if (window.hmcDashboard) {
+            window.hmcDashboard.showNotification('Welcome to H.M.C. Traders AI Dashboard!', 'success');
+            
+            setTimeout(() => {
+                window.hmcDashboard.showNotification('AI systems are online and monitoring your business metrics.', 'info');
+            }, 2000);
+            
+            setTimeout(() => {
+                window.hmcDashboard.showNotification('New export opportunity detected in UAE markets!', 'warning');
+            }, 4000);
+        }
+    }, 1000);
+});
 
-// Global functions for HTML onclick handlers
-function addNewItem() {
-    if (window.invoiceGenerator) {
-        window.invoiceGenerator.addNewItem();
+// Add notification styles dynamically
+const notificationStyles = document.createElement('style');
+notificationStyles.textContent = `
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        padding: var(--space-16);
+        box-shadow: var(--shadow-lg);
+        border-left: 4px solid var(--color-primary);
+        z-index: 1001;
+        min-width: 300px;
+        transform: translateX(100%);
+        opacity: 0;
+        animation: slideInNotification 0.3s ease-out forwards;
     }
-}
-
-function removeItem(rowNumber) {
-    const row = document.querySelector(`[data-row="${rowNumber}"]`);
-    if (row && confirm('Are you sure you want to remove this item?')) {
-        row.remove();
-        
-        if (window.invoiceGenerator) {
-            window.invoiceGenerator.updateRowNumbers();
-            window.invoiceGenerator.calculateTotals();
-            window.invoiceGenerator.scheduleAutoSave();
-            window.invoiceGenerator.showToast('success', 'Item Removed', 'Item removed successfully');
+    
+    .notification.success {
+        border-left-color: var(--color-success);
+    }
+    
+    .notification.warning {
+        border-left-color: var(--color-warning);
+    }
+    
+    .notification.error {
+        border-left-color: var(--color-error);
+    }
+    
+    .notification-content {
+        display: flex;
+        align-items: center;
+        gap: var(--space-12);
+    }
+    
+    .notification-icon {
+        font-size: var(--font-size-lg);
+    }
+    
+    .notification-message {
+        flex: 1;
+        font-size: var(--font-size-sm);
+        color: var(--color-text);
+        line-height: 1.4;
+    }
+    
+    @keyframes slideInNotification {
+        to {
+            transform: translateX(0);
+            opacity: 1;
         }
     }
-}
+`;
 
-function saveInvoice() {
-    if (window.invoiceGenerator) {
-        window.invoiceGenerator.saveInvoice();
-    }
-}
-
-function printInvoice() {
-    if (window.invoiceGenerator) {
-        window.invoiceGenerator.printInvoice();
-    }
-}
-
-function generatePDF() {
-    if (window.invoiceGenerator) {
-        window.invoiceGenerator.generatePDF();
-    }
-}
-
-function resetForm() {
-    if (window.invoiceGenerator) {
-        window.invoiceGenerator.resetForm();
-    }
-}
-
-function updateInvoiceTypeDisplay() {
-    if (window.invoiceGenerator) {
-        window.invoiceGenerator.updateInvoiceTypeDisplay();
-    }
-}
-
-// Initialize the invoice generator when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.invoiceGenerator = new InvoiceGenerator();
-    
-    // Add any additional initialization here
-    console.log('Invoice Generator initialized successfully');
-});
+document.head.appendChild(notificationStyles);
